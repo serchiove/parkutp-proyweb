@@ -1,8 +1,8 @@
-package com.utp.parkutp;
+package com.utp.parkutp.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import com.utp.parkutp.services.SedeService;
+
 
 import com.utp.parkutp.models.Sede;
 import com.utp.parkutp.repositories.SedeRepository;
