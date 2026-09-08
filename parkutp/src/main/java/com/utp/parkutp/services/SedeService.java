@@ -3,6 +3,7 @@ package com.utp.parkutp.services;
 import com.utp.parkutp.models.Sede;
 import com.utp.parkutp.repositories.SedeRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -19,14 +20,19 @@ public class SedeService {
         return sedeRepository.obtenerTodas();
     }
 
-    public Sede guardarSede(Sede sede) {
-        sedeRepository.guardar(sede);
-        return sede;
+    public Optional<Sede> obtenerPorId(String id) {
+        return sedeRepository.obtenerPorId(id);
     }
 
-    public Optional<Sede> buscarPorId(String id) {
-        return sedeRepository.obtenerTodas().stream()
-                .filter(s -> s.getId().equals(id))
-                .findFirst();
+    public Sede guardar(Sede sede) {
+        return sedeRepository.agregarSede(sede);
+    }
+
+    public Sede actualizar(String id, Sede sede) {
+        return sedeRepository.actualizarSede(id, sede);
+    }
+
+    public boolean eliminar(String id) {
+        return sedeRepository.eliminarSede(id);
     }
 }
