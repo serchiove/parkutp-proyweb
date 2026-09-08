@@ -19,22 +19,17 @@ Los principales usuarios considerados son:
 
 ---
 
-## Pruebas de la API
+## Alcance del APF1
 
-El proyecto incluye una colección de Postman denominada
-`APF1-ParkUTP.postman_collection.json`, utilizada para comprobar
-el funcionamiento de los endpoints de la API y sus códigos de respuesta HTTP.
+El alcance conceptual de ParkUTP considera tres recursos principales:
 
-Entre los casos comprobados se encuentran:
+- **Sede:** representa las sedes consideradas por el sistema.
+- **Estacionamiento:** representa las zonas de estacionamiento asociadas a cada sede.
+- **Movimiento:** representa los ingresos y salidas de vehículos.
 
-- Consulta de sedes con respuesta `200 OK`.
-- Registro de una sede con respuesta `201 Created`.
-- Consulta de una sede inexistente con respuesta `404 Not Found`.
-
-Adicionalmente, el CRUD del recurso Sede contempla:
-
-- Actualización mediante `PUT`.
-- Eliminación mediante `DELETE`.
+Para el APF1 se implementa el CRUD en memoria únicamente del recurso **Sede**. 
+Los recursos **Estacionamiento** y **Movimiento** forman parte del diseño del sistema 
+y serán desarrollados progresivamente en las siguientes etapas del proyecto.
 
 ---
 
@@ -162,7 +157,7 @@ El proyecto incluye una colección de Postman denominada
 `APF1-ParkUTP.postman_collection.json`, utilizada para comprobar
 el funcionamiento de los endpoints de la API y sus códigos de respuesta HTTP.
 
-Los casos considerados incluyen:
+Los casos comprobados incluyen:
 
 - `GET /api/sedes` → `200 OK`
 - `GET /api/sedes/{id}` → `200 OK` o `404 Not Found`
