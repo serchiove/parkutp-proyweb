@@ -25,4 +25,9 @@ class SedeControllerTest {
         mockMvc.perform(get("/api/sedes"))
                 .andExpect(status().isOk());
     }
+    @Test
+void deberiaRetornarStatus404ParaRutaInexistente() throws Exception {
+    mockMvc.perform(get("/api/sedes/inexistente"))
+           .andExpect(status().isNotFound());
+}
 }
