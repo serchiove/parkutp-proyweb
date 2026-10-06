@@ -1,182 +1,124 @@
-# ParkUTP
+# ParkUTP — Avance 2
 
-## Descripción
+Evolución del proyecto APF1 para gestionar los estacionamientos de la UTP Arequipa. Conserva la API de sedes y añade persistencia PostgreSQL mediante JDBC, CRUD de estacionamientos, interfaz JSP/Bootstrap y un formulario JSF de sedes. Dos accesos separados: uno de entrada y otro de salida.
 
-ParkUTP es un proyecto orientado al monitoreo de la disponibilidad de estacionamientos de la Universidad Tecnológica del Perú (UTP).
+## Ejecutar en Windows
 
-La propuesta busca facilitar a estudiantes y docentes la consulta de espacios disponibles en los estacionamientos considerados, mediante el desarrollo progresivo de una plataforma web.
+Requisitos: JDK 21, PostgreSQL instalado y acceso a Maven Central en la primera compilación. Bootstrap se incluye en el proyecto mediante WebJars: las pantallas no dependen de un CDN.
 
-En el APF1 se desarrolla una API REST utilizando Spring Boot, aplicando arquitectura por capas, inyección de dependencias, CRUD en memoria y pruebas automatizadas.
+Desde esta carpeta, con PostgreSQL instalado y el puerto 55432 libre:
 
----
-
-## Usuarios
-
-Los principales usuarios considerados son:
-
-- Estudiantes de la UTP que utilizan vehículo.
-- Docentes de la UTP que utilizan vehículo.
-
----
-
-## Alcance del APF1
-
-El alcance conceptual de ParkUTP considera tres recursos principales:
-
-- **Sede:** representa las sedes consideradas por el sistema.
-- **Estacionamiento:** representa las zonas de estacionamiento asociadas a cada sede.
-- **Movimiento:** representa los ingresos y salidas de vehículos.
-
-Para el APF1 se implementa el CRUD en memoria únicamente del recurso **Sede**. 
-Los recursos **Estacionamiento** y **Movimiento** forman parte del diseño del sistema 
-y serán desarrollados progresivamente en las siguientes etapas del proyecto.
-
----
-
-## Tecnologías utilizadas
-
-- Java 21
-- Spring Boot 3.2.5
-- Maven
-- JUnit 5
-- MockMvc
-- API REST
-
----
-
-## Arquitectura
-
-La aplicación utiliza una arquitectura organizada en tres capas:
-
-```text
-Controller
-    ↓
-Service
-    ↓
-Repository
-    ↓
-Almacenamiento en memoria
+```powershell
+.\scripts\Iniciar.ps1 -DemoLocal
 ```
 
-### Controller
+El script crea una instancia PostgreSQL independiente, enlazada a 127.0.0.1, y conserva los datos en `.local-data`. Usa autenticación local de confianza: es solo para una demostración en esta computadora. No configura ni modifica el servicio PostgreSQL existente. Al terminar, Ctrl+C detiene la aplicación; para detener esa instancia de base de datos:
 
-Gestiona las solicitudes HTTP y devuelve las respuestas con los códigos HTTP correspondientes.
+```powershell
+.\scripts\Detener-PostgresLocal.ps1
+```
 
-### Service
+Alternativa con una base existente dedicada al proyecto:
 
-Contiene la lógica de negocio y comunica el Controller con el Repository.
+```powershell
+$env:JAVA_HOME = 'C:\ruta\al\jdk-21'
+$env:DB_URL = 'jdbc:postgresql://localhost:5432/parkutp'
+$env:DB_USER = 'parkutp'
+$env:DB_PASSWORD = 'tu-clave'
+.\scripts\Iniciar.ps1
+```
 
-### Repository
+Crear antes la base `parkutp` y un usuario con permisos sobre ella; la aplicación crea las tablas si no existen. No guardar contraseñas en Git. `schema.sql` sirve para una instalación inicial; cambios futuros del esquema necesitarán migraciones.
 
-Gestiona temporalmente los datos mediante una lista en memoria.
+Abrir [Panel](http://localhost:8081/estacionamientos) y [Sedes JSF](http://localhost:8081/jsf/sedes.xhtml). Registrar primero una sede (ejemplo `AQP-PARRA` / `UTP Arequipa - Sede Parra`) y luego un estacionamiento con capacidad 20. No se incluyen capacidades reales ni datos institucionales inventados.
 
-La comunicación entre las capas se realiza mediante inyección de dependencias por constructor.
+## Arquitectura y distribución
 
----
+```text
+controller/web    MVC: formularios JSP y navegación
+controller/api    API REST y errores HTTP
+view              SedeBean: formulario JSF administrado por Spring/JoinFaces
+dto               Datos de entrada y validaciones
+model             Sede, Estacionamiento, Movimiento
+service           Reglas de negocio y límites transaccionales
+dao               SQL parametrizado mediante JdbcTemplate (JDBC)
+src/main/webapp   JSP en WEB-INF y Facelet sedes.xhtml
+resources         Esquema PostgreSQL, estilos y JS de operación
+```
 
-## Matriz de endpoints REST
+No hay SQL en los controllers, JSP ni el bean JSF. JdbcTemplate usa JDBC y parámetros; no se usa JPA/Hibernate. El WAR permite ejecutar JSP con Tomcat embebido. JoinFaces integra Jakarta Faces 4 con Spring Boot 3.2.5. El término Managed Bean se implementa como bean administrado por Spring, visible en EL de JSF; no se usa la anotación histórica `javax.faces.bean.ManagedBean` de versiones antiguas.
 
-### Recurso Sede - Implementado en APF1
+## Relación con la rúbrica
 
-| Método |     Endpoint      |         Descripción               | Respuesta exitosa | Posible error |
-|--------|-------------------|-----------------------------------|-------------------|---------------|
-|  GET   | `/api/sedes`      | Lista todas las sedes registradas | 200 OK            | -             |
-|  GET   | `/api/sedes/{id}` | Obtiene una sede por su ID        | 200 OK            | 404 Not Found |
-|  POST  | `/api/sedes`      | Registra una nueva sede           | 201 Created       | -             |
-|  PUT   | `/api/sedes/{id}` | Actualiza una sede existente      | 200 OK            | 404 Not Found |
-| DELETE | `/api/sedes/{id}` | Elimina una sede por su ID        | 204 No Content    | 404 Not Found |
+| Requisito | Implementación |
+|---|---|
+| CRUD de entidad principal | Estacionamiento: crear, listar, editar, eliminar desde JSP y REST |
+| MVC, DAO, DTO | Paquetes separados, Service como capa adicional de negocio |
+| Base de datos real con JDBC | PostgreSQL + JdbcTemplate + SQL parametrizado |
+| Validaciones | Bean Validation, restricciones SQL y reglas de negocio |
+| Bootstrap + JSP sin scriptlets | Vistas JSP con JSTL/EL y tags Spring de formulario |
+| JSF + Managed Bean | Registrar Sede con SedeBean y Facelet |
+| Lógica transaccional | Crear estacionamiento y dos accesos juntos; registro de paso y control de aforo |
 
-### Recursos propuestos para etapas posteriores
+## Funciones adicionales
 
-|     Recurso     | Método |           Endpoint           |              Descripción             | Estado    |
-|-----------------|--------|------------------------------|--------------------------------------|-----------|
-| Estacionamiento | GET    | `/api/estacionamientos`      | Lista los estacionamientos           | Propuesto |
-| Estacionamiento | GET    | `/api/estacionamientos/{id}` | Consulta un estacionamiento por ID   | Propuesto |
-| Movimiento      | GET    | `/api/movimientos`           | Consulta los movimientos registrados | Propuesto |
-| Movimiento      | POST   | `/api/movimientos`           | Registra un ingreso o salida         | Propuesto |
+- Creación automática de dos accesos por estacionamiento: ENTRADA y SALIDA.
+- Pantalla de operación con registro manual o simulador de sensor, historial y luz virtual.
+- Actualización cada 5 segundos; no es comunicación instantánea por WebSocket.
+- Aforo calculado a partir de movimientos confirmados, sin contador duplicado.
+- Bloqueo de la fila del estacionamiento durante cada operación: evita sobreaforo al registrar simultáneamente el último espacio.
+- Eventos UUID idempotentes: reenviar el mismo evento con los mismos datos no vuelve a contarlo.
+- Una zona inactiva rechaza entradas pero permite salidas pendientes.
+- No reducir capacidad por debajo de ocupación ni eliminar una zona con historial. Se puede desactivar.
+- Schema de dispositivos preparado para una siguiente etapa.
 
----
+## Alcance y límites
 
-## Ejemplo de Sede
+Prototipo académico, todavía sin autenticación ni roles; no publicar como sistema de producción. La placa es opcional y referencial: aún no existe entidad Vehículo/Estadía, reconocimiento de placas ni validación de doble ingreso por placa. Los sensores físicos y LEDs no están conectados. El origen SIMULADOR identifica eventos de prueba, no dispositivos autenticados.
+
+El conteo comienza en cero. Antes de una prueba deben empezar con una zona vacía y coordinar que un cruce se registre una sola vez (manual o automático). Un sensor real detecta pasos sin saber si hay espacio; si ocurre un ingreso cuando está lleno o una salida sin ocupación, esta versión rechaza el registro. La integración real deberá conservar esos eventos como incidencias y permitir reconciliación auditada del aforo. También deberá gestionar eventos fuera de orden, desconexión y credenciales de dispositivo.
+
+## API
+
+| Método | Ruta | Resultado |
+|---|---|---|
+| GET | `/api/sedes` y `/api/sedes/{id}` | 200 / 404 |
+| POST | `/api/sedes` | 201 / 400 / 409 |
+| PUT | `/api/sedes/{id}` | 200 / 400 / 404 / 409 |
+| DELETE | `/api/sedes/{id}` | 204 / 404 / 409 |
+| GET | `/api/estacionamientos` y `/api/estacionamientos/{id}` | 200 / 404 |
+| POST | `/api/estacionamientos` | 201 / 400 / 404 / 409 |
+| PUT | `/api/estacionamientos/{id}` | 200 / 400 / 404 / 409 |
+| DELETE | `/api/estacionamientos/{id}` | 204 / 404 / 409 |
+| GET | `/api/estacionamientos/{id}/movimientos` | 200 / 404 |
+| POST | `/api/estacionamientos/{id}/movimientos` | 200 / 400 / 404 / 409 |
+
+Ejemplo estacionamiento:
 
 ```json
-{
-  "id": "1",
-  "nombre": "UTP Arequipa - Sede Parra"
-}
+{"sedeId":"AQP-PARRA","nombre":"Principal","capacidad":20,"activo":true}
 ```
 
----
+Ejemplo ingreso; usar UUID nuevo por cruce y conservarlo al reintentar:
 
-## Ejecución del proyecto
+```json
+{"eventoId":"581230cc-d8b9-493a-b600-a2a8804f9b9c","tipo":"ENTRADA","origen":"SIMULADOR","placa":null}
+```
 
-### Requisitos
-
-Para ejecutar el proyecto se requiere:
-
-- Java 21
-- Maven Wrapper incluido en el proyecto
-
-### Windows
-
-Desde una terminal ubicada en la carpeta `parkutp`, ejecutar:
+## Pruebas
 
 ```powershell
-.\mvnw.cmd spring-boot:run
+$env:JAVA_HOME = 'C:\ruta\al\jdk-21'
+$env:TEST_DB_URL = 'jdbc:postgresql://localhost:5432/parkutp_test'
+$env:TEST_DB_USER = 'parkutp'
+$env:TEST_DB_PASSWORD = 'tu-clave'
+.\scripts\Probar.ps1
 ```
 
-Una vez iniciada la aplicación, la API estará disponible en:
+Crear una base dedicada llamada `parkutp_test`. La suite trunca sus tablas antes de cada caso. Sin TEST_DB_URL solo se ejecutan las pruebas de validación y se omite la integración; eso no verifica JDBC ni transacciones. La colección `postman/APF2-ParkUTP.postman_collection.json` prueba CRUD, errores, aforo e idempotencia. Las evidencias del APF1 se conservan como antecedentes; no son evidencia de pruebas del APF2.
 
-```text
-http://localhost:8081
-```
+## Fuentes técnicas
 
-El endpoint principal del recurso Sede es:
-
-```text
-http://localhost:8081/api/sedes
-```
-
----
-
-## Ejecución de pruebas
-
-Para ejecutar las pruebas automatizadas:
-
-```powershell
-.\mvnw.cmd test
-```
-
-Actualmente el proyecto cuenta con pruebas de Service y pruebas mediante MockMvc.
-
----
-
-## Pruebas de la API
-
-El proyecto incluye una colección de Postman denominada
-`APF1-ParkUTP.postman_collection.json`, utilizada para comprobar
-el funcionamiento de los endpoints de la API y sus códigos de respuesta HTTP.
-
-Los casos comprobados incluyen:
-
-- `GET /api/sedes` → `200 OK`
-- `GET /api/sedes/{id}` → `200 OK` o `404 Not Found`
-- `POST /api/sedes` → `201 Created`
-- `PUT /api/sedes/{id}` → `200 OK` o `404 Not Found`
-- `DELETE /api/sedes/{id}` → `204 No Content` o `404 Not Found`
-
-La colección incluye un caso `4xx` mediante la consulta de una sede inexistente,
-que retorna `404 Not Found`.
-
----
-
-## Limitaciones del APF1
-
-En esta primera etapa:
-
-- Los datos se almacenan únicamente en memoria.
-- No se utiliza una base de datos.
-- No se implementa autenticación JWT ni gestión de roles.
-- No se utiliza Angular.
-- No existe integración con servicios cloud.
-- Los sensores para detectar ingresos y salidas de vehículos forman parte de etapas posteriores del proyecto.
+- [Spring Boot: JSP y empaquetado WAR](https://docs.spring.io/spring-boot/3.3/reference/web/servlet.html)
+- [JoinFaces 5.2.5: compatibilidad e integración de JSF](https://docs.joinfaces.org/5.2.5/reference/)
+- [PostgreSQL: bloqueo de filas](https://www.postgresql.org/docs/18/explicit-locking.html)

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core" lang="es">
+<h:head><title>Sedes · ParkUTP</title><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="#{request.contextPath}/webjars/bootstrap/5.3.3/css/bootstrap.min.css"/><link rel="stylesheet" href="#{request.contextPath}/css/parkutp.css"/></h:head>
+<h:body>
+<nav class="navbar navbar-dark park-nav"><div class="container"><a class="navbar-brand fw-bold" href="#{request.contextPath}/estacionamientos">Park<span>UTP</span><small>AREQUIPA</small></a><div class="d-flex gap-3"><a class="nav-link text-white" href="#{request.contextPath}/estacionamientos">Estacionamientos</a><a class="nav-link text-white" href="#{request.contextPath}/jsf/sedes.xhtml">Sedes</a></div></div></nav>
+<main class="container py-5"><div class="eyebrow">CONFIGURACIÓN DE SEDES</div><h1>El punto de partida de tu estacionamiento.</h1><p class="text-secondary">Registra una sede y luego crea sus zonas de estacionamiento.</p>
+<div class="row g-4"><div class="col-lg-5"><div class="parking-card"><h2 class="h4">Registrar sede</h2>
+<h:messages styleClass="alert alert-info" errorClass="text-danger" infoClass="text-success"/>
+<h:form id="sedeForm">
+<div class="mb-3"><h:outputLabel for="codigo" value="Código de sede" styleClass="form-label"/><h:inputText id="codigo" value="#{sedeBean.form.id}" required="true" requiredMessage="El código es obligatorio" maxlength="64" styleClass="form-control"><f:validateRegex pattern="[A-Za-z0-9_-]{1,64}"/></h:inputText><div class="form-text">Ej.: AQP-PARRA. Letras, números, guion y guion bajo.</div><h:message for="codigo" styleClass="text-danger small"/></div>
+<div class="mb-4"><h:outputLabel for="nombre" value="Nombre" styleClass="form-label"/><h:inputText id="nombre" value="#{sedeBean.form.nombre}" required="true" requiredMessage="El nombre es obligatorio" maxlength="120" styleClass="form-control"><f:validateLength minimum="1" maximum="120"/><f:validateRegex pattern="(?s).*\S.*"/></h:inputText><h:message for="nombre" styleClass="text-danger small"/></div>
+<h:commandButton value="Guardar sede" action="#{sedeBean.guardar}" styleClass="btn btn-danger"/>
+</h:form></div></div><div class="col-lg-7"><div class="parking-card"><h2 class="h4">Sedes registradas</h2><h:dataTable value="#{sedeBean.sedes}" var="sede" styleClass="table"><h:column><f:facet name="header">Código</f:facet><h:outputText value="#{sede.id}"/></h:column><h:column><f:facet name="header">Nombre</f:facet><h:outputText value="#{sede.nombre}"/></h:column></h:dataTable><a class="btn btn-outline-dark" href="#{request.contextPath}/estacionamientos/nuevo">Crear estacionamiento</a></div></div></div>
+</main><footer class="container pb-4 text-secondary small">ParkUTP · Prototipo académico APF2</footer>
+</h:body></html>
