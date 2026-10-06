@@ -1,0 +1,120 @@
+{
+  "info": {
+    "name": "ParkUTP - Operación e historial",
+    "description": "Configurar estacionamientoId con una zona existente y fecha/placa con datos reales. No crea ni elimina registros.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "estacionamientoId",
+      "value": "1"
+    },
+    {
+      "key": "fecha",
+      "value": "2026-10-06"
+    },
+    {
+      "key": "placa",
+      "value": "ABC"
+    }
+  ],
+  "item": [
+    {
+      "name": "Aforo actual",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/estacionamientos/{{estacionamientoId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Capacidad consistente', () => { const e = pm.response.json(); pm.expect(e.ocupados + e.disponibles).to.eql(e.capacidad); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Historial sin filtros",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/estacionamientos/{{estacionamientoId}}/movimientos"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Hasta 50 resultados', () => pm.expect(pm.response.json().length).to.be.at.most(50));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Historial por fecha, placa y entrada",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/estacionamientos/{{estacionamientoId}}/movimientos?fecha={{fecha}}&placa={{placa}}&tipo=ENTRADA"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Coincide con filtros', () => { const filas = pm.response.json(); pm.expect(filas.length).to.be.at.most(50); filas.forEach(m => { pm.expect(m.tipo).to.eql('ENTRADA'); pm.expect((m.placa || '').toUpperCase()).to.include(pm.collectionVariables.get('placa').trim().toUpperCase()); const local = new Date(new Date(m.registradoEn).getTime() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10); pm.expect(local).to.eql(pm.collectionVariables.get('fecha')); }); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tipo inválido",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/estacionamientos/{{estacionamientoId}}/movimientos?tipo=OTRO"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Fecha inválida",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/estacionamientos/{{estacionamientoId}}/movimientos?fecha=2026-02-30"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
