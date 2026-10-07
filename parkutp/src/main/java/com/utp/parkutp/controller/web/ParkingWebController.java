@@ -62,6 +62,16 @@ public class ParkingWebController {
     private String formulario(Model model, Long id) {
         model.addAttribute("sedes", sedes.listar());
         model.addAttribute("id", id);
+        var dto = (EstacionamientoDto) model.getAttribute("form");
+        var result = (BindingResult) model.getAttribute(BindingResult.MODEL_KEY_PREFIX + "form");
+        var valores = new java.util.HashMap<String, Object>();
+        valores.put("sedeId", result == null ? dto.getSedeId() : result.getFieldValue("sedeId"));
+        valores.put("nombre", result == null ? dto.getNombre() : result.getFieldValue("nombre"));
+        valores.put("capacidad", result == null ? dto.getCapacidad() : result.getFieldValue("capacidad"));
+        model.addAttribute("valores", valores);
+        model.addAttribute("errores", result == null ? java.util.List.of()
+                : result.getAllErrors().stream().map(error -> error instanceof org.springframework.validation.FieldError campo
+                        && campo.isBindingFailure() ? "La capacidad debe ser un número entero" : error.getDefaultMessage()).toList());
         return "estacionamientos/formulario";
     }
 
