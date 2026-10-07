@@ -56,7 +56,7 @@ No hay SQL en los controllers, JSP ni el bean JSF. JdbcTemplate usa JDBC y pará
 | MVC, DAO, DTO | Paquetes separados, Service como capa adicional de negocio |
 | Base de datos real con JDBC | PostgreSQL + JdbcTemplate + SQL parametrizado |
 | Validaciones | Bean Validation, restricciones SQL y reglas de negocio |
-| Bootstrap + JSP sin scriptlets | Vistas JSP con JSTL/EL y tags Spring de formulario |
+| Bootstrap + JSP sin scriptlets | Vistas JSP con HTML, JSTL y EL; sin etiquetas Spring de formulario |
 | JSF + Managed Bean | Registrar Sede con SedeBean y Facelet |
 | Lógica transaccional | Crear estacionamiento y dos accesos juntos; registro de paso y control de aforo |
 
@@ -117,7 +117,7 @@ $env:TEST_DB_PASSWORD = 'tu-clave'
 .\scripts\Probar.ps1
 ```
 
-Crear una base dedicada llamada `parkutp_test`. La suite trunca sus tablas antes de cada caso. Sin TEST_DB_URL solo se ejecutan las pruebas de validación y se omite la integración; eso no verifica JDBC ni transacciones. La colección `postman/APF2-ParkUTP.postman_collection.json` prueba CRUD, errores, aforo e idempotencia. Las evidencias del APF1 se conservan como antecedentes; no son evidencia de pruebas del APF2.
+Crear una base dedicada llamada `parkutp_test`. La suite trunca sus tablas antes de cada caso. Sin TEST_DB_URL se ejecutan las pruebas independientes de la base y se omite la integración; eso no verifica JDBC ni transacciones. La colección `postman/APF2-ParkUTP.postman_collection.json` prueba CRUD, errores, aforo e idempotencia. Las evidencias del APF1 se conservan como antecedentes; no son evidencia de pruebas del APF2.
 
 ## Fuentes técnicas
 
