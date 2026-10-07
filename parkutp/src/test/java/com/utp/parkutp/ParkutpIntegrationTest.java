@@ -58,6 +58,23 @@ class ParkutpIntegrationTest {
   long id=estacionamientos.crear(estacionamiento(20)).id();movimientos.registrar(id,movimiento("ENTRADA",UUID.randomUUID()));
   assertEquals(19,estacionamientos.buscar(id).getDisponibles());movimientos.registrar(id,movimiento("SALIDA",UUID.randomUUID()));assertEquals(20,estacionamientos.buscar(id).getDisponibles());
  }
+ @Test void historialFiltraAntesDelLimiteYRespetaDiaDeArequipa() throws Exception {
+  long id=estacionamientos.crear(estacionamiento(100)).id();
+  var dto=movimiento("ENTRADA",UUID.randomUUID());dto.setPlaca("ABC-123");
+  long antiguo=movimientos.registrar(id,dto).id();
+  jdbc.update("UPDATE movimiento SET registrado_en=TIMESTAMPTZ '2026-10-07 04:59:59+00' WHERE id=?",antiguo);
+  var salida=movimiento("SALIDA",UUID.randomUUID());salida.setPlaca("ABC-123");
+  long siguiente=movimientos.registrar(id,salida).id();
+  jdbc.update("UPDATE movimiento SET registrado_en=TIMESTAMPTZ '2026-10-07 05:00:00+00' WHERE id=?",siguiente);
+  for(int i=0;i<51;i++) movimientos.registrar(id,movimiento("ENTRADA",UUID.randomUUID()));
+  assertEquals(50,movimientos.recientes(id).size());
+  mvc.perform(get("/api/estacionamientos/"+id+"/movimientos").param("fecha","2026-10-06").param("placa","abc").param("tipo","ENTRADA"))
+   .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1)).andExpect(jsonPath("$[0].id").value(antiguo));
+  mvc.perform(get("/api/estacionamientos/"+id+"/movimientos").param("fecha","2026-10-07").param("placa","ABC").param("tipo","SALIDA"))
+   .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1)).andExpect(jsonPath("$[0].id").value(siguiente));
+  assertTrue(movimientos.recientes(id,null,"%",null).isEmpty());
+  assertEquals(51,estacionamientos.buscar(id).ocupados());
+ }
  @Test void eventoReenviadoSeCuentaUnaVez() {
   long id=estacionamientos.crear(estacionamiento(1)).id();var dto=movimiento("ENTRADA",UUID.randomUUID());
   long movimiento=movimientos.registrar(id,dto).id();assertEquals(movimiento,movimientos.registrar(id,dto).id());assertEquals(1,estacionamientos.buscar(id).ocupados());

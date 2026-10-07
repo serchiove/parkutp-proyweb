@@ -62,6 +62,8 @@ No hay SQL en los controllers, JSP ni el bean JSF. JdbcTemplate usa JDBC y pará
 
 ## Funciones adicionales
 
+El aporte de operación incorpora porcentaje de ocupación, barra de aforo, filtros del historial y mensajes de estado. Detalles, pruebas y guion de demostración en [Operación y aforo](docs/Operacion-y-aforo.md).
+
 - Creación automática de dos accesos por estacionamiento: ENTRADA y SALIDA.
 - Pantalla de operación con registro manual o simulador de sensor, historial y luz virtual.
 - Actualización cada 5 segundos; no es comunicación instantánea por WebSocket.
