@@ -18,6 +18,13 @@ public class MovimientoEntity {
     private long estacionamientoId;
     @Column(name = "acceso_id", nullable = false)
     private long accesoId;
+    // Relaciones de solo lectura: conserva los campos y consultas existentes de Sergio.
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "estacionamiento_id", insertable = false, updatable = false)
+    private EstacionamientoEntity estacionamiento;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "acceso_id", insertable = false, updatable = false)
+    private AccesoEntity acceso;
     @Column(nullable = false, length = 10)
     private String tipo;
     @Column(nullable = false, length = 15)

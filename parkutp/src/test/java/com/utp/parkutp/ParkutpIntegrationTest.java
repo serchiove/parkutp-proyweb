@@ -25,6 +25,50 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestExecutionListeners({ServletTestExecutionListener.class, DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class})
 @EnabledIfEnvironmentVariable(named="TEST_DB_URL",matches=".*")
 class ParkutpIntegrationTest {
+ @Autowired AccesoService accesos;
+ @Test void dispositivoImpideEliminarZonaSinPerderAccesos() {
+  long id=estacionamientos.crear(estacionamiento(5)).id();long acceso=accesos.listar(id).get(0).id();
+  jdbc.update("INSERT INTO dispositivo(acceso_id,codigo) VALUES (?,?)",acceso,"SENSOR-PRUEBA");
+  assertThrows(NegocioException.class,()->estacionamientos.eliminar(id));
+  assertEquals(2,accesos.listar(id).size());assertNotNull(estacionamientos.buscar(id));
+  assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM dispositivo",Integer.class));
+ }
+ @Test void apiAccesoValidaDatosYAusencia() throws Exception {
+  long id=estacionamientos.crear(estacionamiento(5)).id();
+  mvc.perform(post("/api/estacionamientos/"+id+"/accesos").contentType("application/json")
+   .content("{\"nombre\":\"\",\"tipo\":\"OTRO\"}")).andExpect(status().isBadRequest());
+  mvc.perform(get("/api/estacionamientos/"+id+"/accesos/99999")).andExpect(status().isNotFound());
+  mvc.perform(post("/api/estacionamientos/"+id+"/accesos").contentType("application/json")
+   .content("{\"nombre\":\"Otro ingreso\",\"tipo\":\"ENTRADA\"}")).andExpect(status().isConflict());
+ }
+ @Test void falloSegundoAccesoRevierteZonaYPrimerAcceso() {
+  jdbc.execute("CREATE OR REPLACE FUNCTION fallo_acceso_test() RETURNS trigger LANGUAGE plpgsql AS 'BEGIN IF NEW.tipo = ''SALIDA'' THEN RAISE EXCEPTION ''fallo controlado del segundo acceso''; END IF; RETURN NEW; END'");
+  jdbc.execute("CREATE TRIGGER fallo_acceso_test BEFORE INSERT ON acceso FOR EACH ROW EXECUTE FUNCTION fallo_acceso_test()");
+  try {
+   assertThrows(RuntimeException.class,()->estacionamientos.crear(estacionamiento(5)));
+   assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM estacionamiento",Integer.class));
+   assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM acceso",Integer.class));
+  } finally { jdbc.execute("DROP TRIGGER fallo_acceso_test ON acceso");jdbc.execute("DROP FUNCTION fallo_acceso_test()"); }
+ }
+ @Test void sedeJpaNoSobrescribeCodigoDuplicado() {
+  var dto=new SedeDto();dto.setId("AQP");dto.setNombre("Otro nombre");
+  assertThrows(NegocioException.class,()->sedes.crear(dto));
+  assertEquals("UTP Arequipa",sedes.buscar("AQP").nombre());
+  dto.setId("OTRA");sedes.crear(dto);dto.setNombre("Renombrada");sedes.actualizar("OTRA",dto);
+  assertEquals("Renombrada",sedes.buscar("OTRA").nombre());sedes.eliminar("OTRA");
+  assertThrows(NegocioException.class,()->sedes.buscar("OTRA"));
+ }
+ @Test void accesosCrudYProteccionDeHistorial() throws Exception {
+  long e=estacionamientos.crear(estacionamiento(3)).id();var entrada=accesos.listar(e).stream().filter(a->a.tipo().equals("ENTRADA")).findFirst().orElseThrow();
+  var dto=new AccesoDto();dto.setNombre("Ingreso principal");dto.setTipo("ENTRADA");
+  accesos.actualizar(e,entrada.id(),dto);assertEquals("Ingreso principal",accesos.buscar(e,entrada.id()).nombre());
+  assertThrows(NegocioException.class,()->accesos.crear(e,dto));
+  long anterior=entrada.id();accesos.eliminar(e,anterior);assertThrows(NegocioException.class,()->accesos.buscar(e,anterior));
+  entrada=accesos.crear(e,dto);long id=entrada.id();movimientos.registrar(e,movimiento("ENTRADA",UUID.randomUUID()));
+  assertThrows(NegocioException.class,()->accesos.eliminar(e,id));assertNotNull(accesos.buscar(e,id));
+  mvc.perform(get("/api/estacionamientos/"+e+"/accesos")).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2));
+  mvc.perform(delete("/api/estacionamientos/"+e+"/accesos/"+id)).andExpect(status().isConflict());
+ }
  @Autowired JdbcTemplate jdbc;
  @Autowired SedeService sedes;
  @Autowired EstacionamientoService estacionamientos;
