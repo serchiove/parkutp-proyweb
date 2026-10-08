@@ -41,14 +41,22 @@ view              SedeBean: formulario JSF administrado por Spring/JoinFaces
 dto               Datos de entrada y validaciones
 model             Sede, Estacionamiento, Movimiento
 service           Reglas de negocio y límites transaccionales
-dao               SQL parametrizado mediante JdbcTemplate (JDBC)
+dao               SQL mediante JdbcTemplate y adaptación al repositorio de movimientos
+entity            MovimientoEntity: mapeo JPA de la tabla movimiento
+repository        Lectura de movimientos con Spring Data JPA y JPQL
 src/main/webapp   JSP en WEB-INF y Facelet sedes.xhtml
 resources         Esquema PostgreSQL, estilos y JS de operación
 ```
 
-No hay SQL en los controllers, JSP ni el bean JSF. JdbcTemplate usa JDBC y parámetros; no se usa JPA/Hibernate. El WAR permite ejecutar JSP con Tomcat embebido. JoinFaces integra Jakarta Faces 4 con Spring Boot 3.2.5. El término Managed Bean se implementa como bean administrado por Spring, visible en EL de JSF; no se usa la anotación histórica `javax.faces.bean.ManagedBean` de versiones antiguas.
+No hay SQL en los controllers, JSP ni el bean JSF. La migración a JPA/Hibernate comenzó con la lectura del historial y la búsqueda de eventos repetidos; las escrituras y los demás CRUD todavía utilizan JdbcTemplate. El WAR permite ejecutar JSP con Tomcat embebido. JoinFaces integra Jakarta Faces 4 con Spring Boot 3.2.5. El término Managed Bean se implementa como bean administrado por Spring, visible en EL de JSF; no se usa la anotación histórica `javax.faces.bean.ManagedBean` de versiones antiguas.
 
-## Relación con la rúbrica
+## Adecuación al checklist APF2
+
+Primera etapa implementada: entidad de movimientos, repositorio de lectura y consulta JPQL del historial con filtros antes del límite de 50 resultados. Hibernate no modifica el esquema existente. Detalles y verificación en [Migración del historial a JPQL](docs/JPQL-historial.md).
+
+Para completar el checklist todavía faltan los CRUD mediante JPA/Hibernate, completar la operación de negocio con la persistencia migrada, Spring Security con roles, autenticación JWT y las pruebas de autorización correspondientes. Esta etapa no completa por sí sola el APF2.
+
+## Funciones actuales
 
 | Requisito | Implementación |
 |---|---|
