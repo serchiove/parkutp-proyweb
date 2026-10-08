@@ -1,6 +1,9 @@
 package com.utp.parkutp.dao;
 
 import com.utp.parkutp.model.Movimiento;
+import com.utp.parkutp.entity.MovimientoEntity;
+import com.utp.parkutp.repository.MovimientoRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.Repository;
 import java.time.OffsetDateTime;
@@ -11,17 +14,19 @@ import java.util.*;
 @Repository
 public class MovimientoDao {
     private final JdbcTemplate jdbc;
+    private final MovimientoRepository repository;
     private final RowMapper<Movimiento> mapper = (rs, n) -> new Movimiento(rs.getLong("id"),
             rs.getObject("evento_id", UUID.class), rs.getLong("estacionamiento_id"), rs.getLong("acceso_id"),
             rs.getString("tipo"), rs.getString("origen"), rs.getString("placa"),
             rs.getObject("registrado_en", OffsetDateTime.class));
 
-    public MovimientoDao(JdbcTemplate jdbc) {
+    public MovimientoDao(JdbcTemplate jdbc, MovimientoRepository repository) {
         this.jdbc = jdbc;
+        this.repository = repository;
     }
 
     public Optional<Movimiento> buscarEvento(UUID evento) {
-        return jdbc.query("SELECT * FROM movimiento WHERE evento_id=?", mapper, evento).stream().findFirst();
+        return repository.findByEventoId(evento).map(MovimientoEntity::toModel);
     }
 
     public Movimiento insertar(UUID evento, long estacionamiento, long acceso, String tipo, String origen,
@@ -36,24 +41,15 @@ public class MovimientoDao {
     }
 
     public List<Movimiento> recientes(long id, LocalDate fecha, String placa, String tipo) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM movimiento WHERE estacionamiento_id=?");
-        List<Object> parametros = new ArrayList<>();
-        parametros.add(id);
+        OffsetDateTime desde = null, hasta = null;
         if (fecha != null) {
             ZoneId zona = ZoneId.of("America/Lima");
-            sql.append(" AND registrado_en>=? AND registrado_en<?");
-            parametros.add(fecha.atStartOfDay(zona).toOffsetDateTime());
-            parametros.add(fecha.plusDays(1).atStartOfDay(zona).toOffsetDateTime());
+            desde = fecha.atStartOfDay(zona).toOffsetDateTime();
+            hasta = fecha.plusDays(1).atStartOfDay(zona).toOffsetDateTime();
         }
-        if (placa != null && !placa.isBlank()) {
-            sql.append(" AND strpos(UPPER(placa),?)>0");
-            parametros.add(placa.trim().toUpperCase(Locale.ROOT));
-        }
-        if (tipo != null && !tipo.isBlank()) {
-            sql.append(" AND tipo=?");
-            parametros.add(tipo);
-        }
-        sql.append(" ORDER BY registrado_en DESC,id DESC LIMIT 50");
-        return jdbc.query(sql.toString(), mapper, parametros.toArray());
+        String placaNormalizada = placa == null || placa.isBlank() ? null : placa.trim().toUpperCase(Locale.ROOT);
+        String tipoNormalizado = tipo == null || tipo.isBlank() ? null : tipo;
+        return repository.buscarHistorial(id, desde, hasta, placaNormalizada, tipoNormalizado, PageRequest.of(0, 50))
+            .stream().map(MovimientoEntity::toModel).toList();
     }
 }
