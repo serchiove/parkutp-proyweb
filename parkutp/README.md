@@ -41,20 +41,20 @@ view              SedeBean: formulario JSF administrado por Spring/JoinFaces
 dto               Datos de entrada y validaciones
 model             Sede, Estacionamiento, Movimiento
 service           Reglas de negocio y límites transaccionales
-dao               Adaptadores JPA; el INSERT de movimientos sigue con JDBC
+dao               Adaptadores JPA para sedes, estacionamientos y movimientos
 entity            Sede, Estacionamiento, Acceso, Dispositivo y Movimiento mapeados con JPA
 repository        CRUD Spring Data JPA y consultas JPQL de historial y aforo
 src/main/webapp   JSP en WEB-INF y Facelet sedes.xhtml
 resources         Esquema PostgreSQL, estilos y JS de operación
 ```
 
-No hay SQL en los controllers, JSP ni el bean JSF. Los CRUD de sede, estacionamiento y acceso usan JPA/Hibernate. El historial y aforo se consultan por JPQL; el INSERT de movimientos todavía utiliza JdbcTemplate durante la migración de Sergio. El WAR permite ejecutar JSP con Tomcat embebido. JoinFaces integra Jakarta Faces 4 con Spring Boot 3.2.5. El término Managed Bean se implementa como bean administrado por Spring, visible en EL de JSF; no se usa la anotación histórica `javax.faces.bean.ManagedBean` de versiones antiguas.
+No hay SQL en los controllers, JSP ni el bean JSF. Los CRUD de sede, estacionamiento y acceso y el registro de movimientos usan JPA/Hibernate. El historial y aforo se consultan por JPQL. PostgreSQL genera la fecha de cada movimiento y Hibernate la recupera para la respuesta. El WAR permite ejecutar JSP con Tomcat embebido. JoinFaces integra Jakarta Faces 4 con Spring Boot 3.2.5. El término Managed Bean se implementa como bean administrado por Spring, visible en EL de JSF; no se usa la anotación histórica `javax.faces.bean.ManagedBean` de versiones antiguas.
 
 ## Adecuación al checklist APF2
 
 Primera etapa implementada: entidad de movimientos, repositorio de lectura y consulta JPQL del historial con filtros antes del límite de 50 resultados. Hibernate no modifica el esquema existente. Detalles y verificación en [Migración del historial a JPQL](docs/JPQL-historial.md).
 
-El CRUD JPA y la creación transaccional de estacionamiento y accesos están implementados. Detalles y pruebas del aporte de Melissa en [Persistencia JPA](docs/Persistencia-JPA-Melissa.md). Falta completar la escritura JPA de movimientos y agregar Spring Security con roles, JWT y sus pruebas de autorización.
+El CRUD JPA y la creación transaccional de estacionamiento y accesos están implementados. Detalles y pruebas del aporte de Melissa en [Persistencia JPA](docs/Persistencia-JPA-Melissa.md). El registro transaccional de movimientos también usa JPA; detalles en [Registro de movimientos](docs/Registro-movimientos-JPA.md). Falta agregar Spring Security con roles, JWT y sus pruebas de autorización.
 
 ## Funciones actuales
 
@@ -62,7 +62,7 @@ El CRUD JPA y la creación transaccional de estacionamiento y accesos están imp
 |---|---|
 | CRUD de entidad principal | Estacionamiento: crear, listar, editar, eliminar desde JSP y REST |
 | MVC, DAO, DTO | Paquetes separados, Service como capa adicional de negocio |
-| Persistencia JPA | PostgreSQL + Hibernate + repositorios; escritura de movimientos aún JDBC |
+| Persistencia JPA | PostgreSQL + Hibernate + repositorios para CRUD y registro de movimientos |
 | Validaciones | Bean Validation, restricciones SQL y reglas de negocio |
 | Bootstrap + JSP sin scriptlets | Vistas JSP con HTML, JSTL y EL; sin etiquetas Spring de formulario |
 | JSF + Managed Bean | Registrar Sede con SedeBean y Facelet |
@@ -125,7 +125,7 @@ $env:TEST_DB_PASSWORD = 'tu-clave'
 .\scripts\Probar.ps1
 ```
 
-Crear una base dedicada llamada `parkutp_test`. La suite trunca sus tablas antes de cada caso. Sin TEST_DB_URL se ejecutan las pruebas independientes de la base y se omite la integración; eso no verifica JDBC ni transacciones. La colección `postman/APF2-ParkUTP.postman_collection.json` prueba CRUD, errores, aforo e idempotencia. Las evidencias del APF1 se conservan como antecedentes; no son evidencia de pruebas del APF2.
+Crear una base dedicada llamada `parkutp_test`. La suite trunca sus tablas antes de cada caso. Sin TEST_DB_URL se ejecutan las pruebas independientes de la base y se omite la integración; eso no verifica la persistencia con PostgreSQL ni las transacciones. La colección `postman/APF2-ParkUTP.postman_collection.json` prueba CRUD, errores, aforo e idempotencia. Las evidencias del APF1 se conservan como antecedentes; no son evidencia de pruebas del APF2.
 
 ## Fuentes técnicas
 
