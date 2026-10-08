@@ -1,66 +1,42 @@
 package com.utp.parkutp.dao;
-
 import com.utp.parkutp.model.Estacionamiento;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import com.utp.parkutp.entity.*;
+import com.utp.parkutp.repository.*;
+import com.utp.parkutp.exception.NegocioException;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
-
-@Repository
+@Repository @Transactional(readOnly=true)
 public class EstacionamientoDao {
-    private final JdbcTemplate jdbc;
-    private static final String SELECT = """
-            SELECT e.*, s.nombre AS sede_nombre,
-             COALESCE((SELECT SUM(CASE WHEN m.tipo='ENTRADA' THEN 1 ELSE -1 END) FROM movimiento m WHERE m.estacionamiento_id=e.id),0)::int AS ocupados
-            FROM estacionamiento e JOIN sede s ON s.id=e.sede_id
-            """;
-    private final RowMapper<Estacionamiento> mapper = (rs, n) -> new Estacionamiento(rs.getLong("id"),
-            rs.getString("sede_id"), rs.getString("sede_nombre"), rs.getString("nombre"), rs.getInt("capacidad"),
-            rs.getBoolean("activo"), rs.getInt("ocupados"));
-
-    public EstacionamientoDao(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-    }
-
-    public List<Estacionamiento> listar() {
-        return jdbc.query(SELECT + " ORDER BY e.id", mapper);
-    }
-
-    public Optional<Estacionamiento> buscar(long id) {
-        return jdbc.query(SELECT + " WHERE e.id=?", mapper, id).stream().findFirst();
-    }
-
-    // Todos los cambios de capacidad y movimientos toman el mismo bloqueo.
-    public boolean bloquear(long id) {
-        return !jdbc.queryForList("SELECT id FROM estacionamiento WHERE id=? FOR UPDATE", id).isEmpty();
-    }
-
-    public long insertar(String sede, String nombre, int capacidad, boolean activo) {
-        return jdbc.queryForObject(
-                "INSERT INTO estacionamiento(sede_id,nombre,capacidad,activo) VALUES (?,?,?,?) RETURNING id",
-                Long.class, sede, nombre, capacidad, activo);
-    }
-
-    public void crearAccesos(long id) {
-        jdbc.update(
-                "INSERT INTO acceso(estacionamiento_id,nombre,tipo) VALUES (?,'Acceso de ingreso','ENTRADA'),(?,'Acceso de salida','SALIDA')",
-                id, id);
-    }
-
-    public long acceso(long id, String tipo) {
-        return jdbc.queryForObject("SELECT id FROM acceso WHERE estacionamiento_id=? AND tipo=?", Long.class, id, tipo);
-    }
-
-    public void actualizar(long id, String sede, String nombre, int capacidad, boolean activo) {
-        jdbc.update("UPDATE estacionamiento SET sede_id=?,nombre=?,capacidad=?,activo=? WHERE id=?", sede, nombre,
-                capacidad, activo, id);
-    }
-
-    public long cantidadMovimientos(long id) {
-        return jdbc.queryForObject("SELECT COUNT(*) FROM movimiento WHERE estacionamiento_id=?", Long.class, id);
-    }
-
-    public void eliminar(long id) {
-        jdbc.update("DELETE FROM estacionamiento WHERE id=?", id);
-    }
+ private final EstacionamientoRepository repository;
+ private final SedeRepository sedes;private final AccesoRepository accesos;private final MovimientoRepository movimientos;
+ public EstacionamientoDao(EstacionamientoRepository repository,SedeRepository sedes,AccesoRepository accesos,MovimientoRepository movimientos){
+  this.repository=repository;this.sedes=sedes;this.accesos=accesos;this.movimientos=movimientos;
+ }
+ private Estacionamiento toModel(EstacionamientoEntity e){
+  return new Estacionamiento(e.getId(),e.getSede().getId(),e.getSede().getNombre(),e.getNombre(),e.getCapacidad(),e.isActivo(),Math.toIntExact(movimientos.ocupados(e.getId())));
+ }
+ public List<Estacionamiento> listar(){return repository.listarConSede().stream().map(this::toModel).toList();}
+ public Optional<Estacionamiento> buscar(long id){return repository.findById(id).map(this::toModel);}
+ @Transactional public boolean bloquear(long id){return repository.bloquear(id).isPresent();}
+ @Transactional public long insertar(String sede,String nombre,int capacidad,boolean activo){
+  return repository.saveAndFlush(new EstacionamientoEntity(sedes.getReferenceById(sede),nombre,capacidad,activo)).getId();
+ }
+ @Transactional public void crearAccesos(long id){
+  var e=repository.getReferenceById(id);
+  accesos.saveAllAndFlush(List.of(new AccesoEntity(e,"Acceso de ingreso","ENTRADA"),new AccesoEntity(e,"Acceso de salida","SALIDA")));
+ }
+ public long acceso(long id,String tipo){
+  return accesos.findByEstacionamientoIdAndTipo(id,tipo).orElseThrow(()->NegocioException.conflicto("No está configurado el acceso de "+tipo)).getId();
+ }
+ @Transactional public void actualizar(long id,String sede,String nombre,int capacidad,boolean activo){
+  var e=repository.findById(id).orElseThrow(()->NegocioException.noEncontrado("El estacionamiento no existe"));
+  e.actualizar(sedes.getReferenceById(sede),nombre,capacidad,activo);repository.flush();
+ }
+ public long cantidadMovimientos(long id){return movimientos.contarPorEstacionamiento(id);}
+ @Transactional public void eliminar(long id){
+  // Las FK de movimientos y dispositivos impiden borrar historial asociado.
+  accesos.deleteAll(accesos.findByEstacionamientoIdOrderById(id));accesos.flush();
+  repository.deleteById(id);repository.flush();
+ }
 }

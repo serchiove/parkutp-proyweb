@@ -1,0 +1,184 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< com.utp:parkutp >---------------------------
+[INFO] Building ParkUTP APF2 0.0.2-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ parkutp ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 3 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ parkutp ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ parkutp ---
+[INFO] Copying 1 resource from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ parkutp ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ parkutp ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.utp.parkutp.FormularioEstacionamientoTest
+14:21:34.458 [main] INFO org.hibernate.validator.internal.util.Version -- HV000001: Hibernate Validator 8.0.1.Final
+14:21:35.021 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:21:35.021 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:21:35.025 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 4 ms
+14:21:35.265 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:21:35.265 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:21:35.265 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:21:35.305 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:21:35.305 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:21:35.305 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:21:35.323 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:21:35.323 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:21:35.323 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.204 s -- in com.utp.parkutp.FormularioEstacionamientoTest
+[INFO] Running com.utp.parkutp.HistorialApiTest
+14:21:35.953 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:21:35.954 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:21:35.954 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:21:36.047 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:21:36.047 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:21:36.047 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:21:36.064 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:21:36.064 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:21:36.064 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:21:36.145 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:21:36.145 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:21:36.145 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:21:36.159 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:21:36.159 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:21:36.159 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.827 s -- in com.utp.parkutp.HistorialApiTest
+[INFO] Running com.utp.parkutp.MovimientoRepositoryTest
+14:21:36.195 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.utp.parkutp.MovimientoRepositoryTest]: MovimientoRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+14:21:36.291 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.utp.parkutp.ParkutpApplication for test class com.utp.parkutp.MovimientoRepositoryTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-10-08T14:21:36.645-05:00  INFO 23704 --- [parkutp] [           main] c.utp.parkutp.MovimientoRepositoryTest   : Starting MovimientoRepositoryTest using Java 21.0.12 with PID 23704 (started by monte in C:\Users\monte\Downloads\GITHUB\parkutp-proyweb\parkutp-proyweb\parkutp)
+2026-10-08T14:21:36.646-05:00  INFO 23704 --- [parkutp] [           main] c.utp.parkutp.MovimientoRepositoryTest   : No active profile set, falling back to 1 default profile: "default"
+2026-10-08T14:21:36.987-05:00  INFO 23704 --- [parkutp] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-08T14:21:37.061-05:00  INFO 23704 --- [parkutp] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 64 ms. Found 4 JPA repository interfaces.
+2026-10-08T14:21:37.114-05:00  INFO 23704 --- [parkutp] [           main] beddedDataSourceBeanFactoryPostProcessor : Replacing 'dataSource' DataSource bean with embedded version
+2026-10-08T14:21:37.255-05:00  INFO 23704 --- [parkutp] [           main] o.s.j.d.e.EmbeddedDatabaseFactory        : Starting embedded database: url='jdbc:h2:mem:41152e09-c9b5-42dc-8752-cea3b8cf23e5;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+2026-10-08T14:21:37.566-05:00  INFO 23704 --- [parkutp] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-08T14:21:37.656-05:00  INFO 23704 --- [parkutp] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-10-08T14:21:37.693-05:00  INFO 23704 --- [parkutp] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-10-08T14:21:37.805-05:00  INFO 23704 --- [parkutp] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-08T14:21:38.645-05:00  INFO 23704 --- [parkutp] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: drop table if exists acceso cascade 
+Hibernate: drop table if exists dispositivo cascade 
+Hibernate: drop table if exists estacionamiento cascade 
+Hibernate: drop table if exists movimiento cascade 
+Hibernate: drop table if exists sede cascade 
+Hibernate: create table acceso (estacionamiento_id bigint not null, id bigint generated by default as identity, tipo varchar(10) not null, nombre varchar(80) not null, primary key (id), unique (estacionamiento_id, tipo))
+Hibernate: create table dispositivo (activo boolean not null, acceso_id bigint not null, id bigint generated by default as identity, ultima_comunicacion timestamp(6) with time zone, codigo varchar(80) not null unique, primary key (id))
+Hibernate: create table estacionamiento (activo boolean not null, capacidad integer not null, id bigint generated by default as identity, sede_id varchar(64) not null, nombre varchar(120) not null, primary key (id))
+Hibernate: create table movimiento (acceso_id bigint not null, estacionamiento_id bigint not null, id bigint generated by default as identity, registrado_en timestamp(6) with time zone not null, tipo varchar(10) not null, placa varchar(12), origen varchar(15) not null, evento_id uuid not null unique, primary key (id))
+Hibernate: create table sede (id varchar(64) not null, nombre varchar(120) not null, primary key (id))
+Hibernate: alter table if exists acceso add constraint FK918nt330afhgpuoimeso4u6lp foreign key (estacionamiento_id) references estacionamiento
+Hibernate: alter table if exists dispositivo add constraint FKsmdha7xd9b40rx8yn2anqgvsk foreign key (acceso_id) references acceso
+Hibernate: alter table if exists estacionamiento add constraint FK4xl5adtwdochj2xaogxklce38 foreign key (sede_id) references sede
+Hibernate: alter table if exists movimiento add constraint FKqcqat4wngch0uoyfe8pc9c9k foreign key (acceso_id) references acceso
+Hibernate: alter table if exists movimiento add constraint FK664ke0llgcnl0qf6sx6buqus9 foreign key (estacionamiento_id) references estacionamiento
+2026-10-08T14:21:38.706-05:00  INFO 23704 --- [parkutp] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-08T14:21:39.068-05:00  INFO 23704 --- [parkutp] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-08T14:21:39.766-05:00  INFO 23704 --- [parkutp] [           main] c.utp.parkutp.MovimientoRepositoryTest   : Started MovimientoRepositoryTest in 3.427 seconds (process running for 6.296)
+Hibernate: select me1_0.id,me1_0.acceso_id,me1_0.estacionamiento_id,me1_0.evento_id,me1_0.origen,me1_0.placa,me1_0.registrado_en,me1_0.tipo from movimiento me1_0 where me1_0.evento_id=?
+Hibernate: select me1_0.id,me1_0.acceso_id,me1_0.estacionamiento_id,me1_0.evento_id,me1_0.origen,me1_0.placa,me1_0.registrado_en,me1_0.tipo from movimiento me1_0 where me1_0.evento_id=?
+Hibernate: select me1_0.id,me1_0.acceso_id,me1_0.estacionamiento_id,me1_0.evento_id,me1_0.origen,me1_0.placa,me1_0.registrado_en,me1_0.tipo from movimiento me1_0 where me1_0.estacionamiento_id=? and (?=false or me1_0.registrado_en>=?) and (?=false or me1_0.registrado_en<?) and (?='' or locate(upper(?),upper(me1_0.placa))>0) and (?='' or me1_0.tipo=?) order by me1_0.registrado_en desc,me1_0.id desc offset ? rows fetch first ? rows only
+Hibernate: select me1_0.id,me1_0.acceso_id,me1_0.estacionamiento_id,me1_0.evento_id,me1_0.origen,me1_0.placa,me1_0.registrado_en,me1_0.tipo from movimiento me1_0 where me1_0.estacionamiento_id=? and (?=false or me1_0.registrado_en>=?) and (?=false or me1_0.registrado_en<?) and (?='' or locate(upper(?),upper(me1_0.placa))>0) and (?='' or me1_0.tipo=?) order by me1_0.registrado_en desc,me1_0.id desc offset ? rows fetch first ? rows only
+Hibernate: select me1_0.id,me1_0.acceso_id,me1_0.estacionamiento_id,me1_0.evento_id,me1_0.origen,me1_0.placa,me1_0.registrado_en,me1_0.tipo from movimiento me1_0 where me1_0.estacionamiento_id=? and (?=false or me1_0.registrado_en>=?) and (?=false or me1_0.registrado_en<?) and (?='' or locate(upper(?),upper(me1_0.placa))>0) and (?='' or me1_0.tipo=?) order by me1_0.registrado_en desc,me1_0.id desc offset ? rows fetch first ? rows only
+Hibernate: select me1_0.id,me1_0.acceso_id,me1_0.estacionamiento_id,me1_0.evento_id,me1_0.origen,me1_0.placa,me1_0.registrado_en,me1_0.tipo from movimiento me1_0 where me1_0.estacionamiento_id=? and (?=false or me1_0.registrado_en>=?) and (?=false or me1_0.registrado_en<?) and (?='' or locate(upper(?),upper(me1_0.placa))>0) and (?='' or me1_0.tipo=?) order by me1_0.registrado_en desc,me1_0.id desc offset ? rows fetch first ? rows only
+Hibernate: select me1_0.id,me1_0.acceso_id,me1_0.estacionamiento_id,me1_0.evento_id,me1_0.origen,me1_0.placa,me1_0.registrado_en,me1_0.tipo from movimiento me1_0 where me1_0.estacionamiento_id=? and (?=false or me1_0.registrado_en>=?) and (?=false or me1_0.registrado_en<?) and (?='' or locate(upper(?),upper(me1_0.placa))>0) and (?='' or me1_0.tipo=?) order by me1_0.registrado_en desc,me1_0.id desc offset ? rows fetch first ? rows only
+Hibernate: select me1_0.id,me1_0.acceso_id,me1_0.estacionamiento_id,me1_0.evento_id,me1_0.origen,me1_0.placa,me1_0.registrado_en,me1_0.tipo from movimiento me1_0 where me1_0.estacionamiento_id=? and (?=false or me1_0.registrado_en>=?) and (?=false or me1_0.registrado_en<?) and (?='' or locate(upper(?),upper(me1_0.placa))>0) and (?='' or me1_0.tipo=?) order by me1_0.registrado_en desc,me1_0.id desc offset ? rows fetch first ? rows only
+Hibernate: select me1_0.id,me1_0.acceso_id,me1_0.estacionamiento_id,me1_0.evento_id,me1_0.origen,me1_0.placa,me1_0.registrado_en,me1_0.tipo from movimiento me1_0 where me1_0.estacionamiento_id=? and (?=false or me1_0.registrado_en>=?) and (?=false or me1_0.registrado_en<?) and (?='' or locate(upper(?),upper(me1_0.placa))>0) and (?='' or me1_0.tipo=?) order by me1_0.registrado_en desc,me1_0.id desc offset ? rows fetch first ? rows only
+Hibernate: select me1_0.id,me1_0.acceso_id,me1_0.estacionamiento_id,me1_0.evento_id,me1_0.origen,me1_0.placa,me1_0.registrado_en,me1_0.tipo from movimiento me1_0 where me1_0.estacionamiento_id=? and (?=false or me1_0.registrado_en>=?) and (?=false or me1_0.registrado_en<?) and (?='' or locate(upper(?),upper(me1_0.placa))>0) and (?='' or me1_0.tipo=?) order by me1_0.registrado_en desc,me1_0.id desc offset ? rows fetch first ? rows only
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.877 s -- in com.utp.parkutp.MovimientoRepositoryTest
+[INFO] Running com.utp.parkutp.ParkutpIntegrationTest
+2026-10-08T14:21:40.050-05:00  INFO 23704 --- [parkutp] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.utp.parkutp.ParkutpIntegrationTest]: ParkutpIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-08T14:21:40.057-05:00  INFO 23704 --- [parkutp] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.utp.parkutp.ParkutpApplication for test class com.utp.parkutp.ParkutpIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-10-08T14:21:40.100-05:00  INFO 23704 --- [parkutp] [           main] com.utp.parkutp.ParkutpIntegrationTest   : Starting ParkutpIntegrationTest using Java 21.0.12 with PID 23704 (started by monte in C:\Users\monte\Downloads\GITHUB\parkutp-proyweb\parkutp-proyweb\parkutp)
+2026-10-08T14:21:40.100-05:00  INFO 23704 --- [parkutp] [           main] com.utp.parkutp.ParkutpIntegrationTest   : No active profile set, falling back to 1 default profile: "default"
+2026-10-08T14:21:40.499-05:00  INFO 23704 --- [parkutp] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-08T14:21:40.523-05:00  INFO 23704 --- [parkutp] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 24 ms. Found 4 JPA repository interfaces.
+2026-10-08T14:21:40.757-05:00  INFO 23704 --- [parkutp] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-08T14:21:40.930-05:00  INFO 23704 --- [parkutp] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5da48ec5
+2026-10-08T14:21:40.930-05:00  INFO 23704 --- [parkutp] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-08T14:21:40.973-05:00  INFO 23704 --- [parkutp] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-08T14:21:40.980-05:00  INFO 23704 --- [parkutp] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-10-08T14:21:40.986-05:00  INFO 23704 --- [parkutp] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-08T14:21:41.127-05:00  INFO 23704 --- [parkutp] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-08T14:21:41.175-05:00  INFO 23704 --- [parkutp] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-08T14:21:41.778-05:00  INFO 23704 --- [parkutp] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-10-08T14:21:41.778-05:00  INFO 23704 --- [parkutp] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-10-08T14:21:41.778-05:00  INFO 23704 --- [parkutp] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-10-08T14:21:41.789-05:00  INFO 23704 --- [parkutp] [           main] com.utp.parkutp.ParkutpIntegrationTest   : Started ParkutpIntegrationTest in 1.726 seconds (process running for 8.319)
+2026-10-08T14:21:41.937-05:00  WARN 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23503
+2026-10-08T14:21:41.938-05:00 ERROR 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: update or delete on table "sede" violates foreign key constraint "estacionamiento_sede_id_fkey" on table "estacionamiento"
+  Detail: Key (id)=(AQP) is still referenced from table "estacionamiento".
+2026-10-08T14:21:42.525-05:00  WARN 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-10-08T14:21:42.525-05:00 ERROR 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "sede_pkey"
+  Detail: Key (id)=(AQP) already exists.
+2026-10-08T14:21:42.991-05:00  WARN 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-10-08T14:21:42.991-05:00 ERROR 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "estacionamiento_nombre_unico"
+  Detail: Key (sede_id, lower(nombre::text))=(AQP, principal) already exists.
+2026-10-08T14:21:43.374-05:00  WARN 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23503
+2026-10-08T14:21:43.374-05:00 ERROR 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: update or delete on table "acceso" violates foreign key constraint "dispositivo_acceso_id_fkey" on table "dispositivo"
+  Detail: Key (id)=(1) is still referenced from table "dispositivo".
+2026-10-08T14:21:43.475-05:00  WARN 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23503
+2026-10-08T14:21:43.475-05:00 ERROR 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: update or delete on table "acceso" violates foreign key constraint "movimiento_acceso_id_estacionamiento_id_tipo_fkey" on table "movimiento"
+  Detail: Key (id, estacionamiento_id, tipo)=(3, 1, ENTRADA) is still referenced from table "movimiento".
+2026-10-08T14:21:43.488-05:00  WARN 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23503
+2026-10-08T14:21:43.488-05:00 ERROR 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: update or delete on table "acceso" violates foreign key constraint "movimiento_acceso_id_estacionamiento_id_tipo_fkey" on table "movimiento"
+  Detail: Key (id, estacionamiento_id, tipo)=(3, 1, ENTRADA) is still referenced from table "movimiento".
+2026-10-08T14:21:43.753-05:00  WARN 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+2026-10-08T14:21:43.753-05:00 ERROR 23704 --- [parkutp] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: fallo controlado del segundo acceso
+  Where: PL/pgSQL function fallo_acceso_test() line 1 at RAISE
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.872 s -- in com.utp.parkutp.ParkutpIntegrationTest
+[INFO] Running com.utp.parkutp.ValidacionDtoTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in com.utp.parkutp.ValidacionDtoTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 35, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- war:3.4.0:war (default-war) @ parkutp ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [parkutp] in [C:\Users\monte\Downloads\GITHUB\parkutp-proyweb\parkutp-proyweb\parkutp\target\parkutp-apf2]
+[INFO] Processing war project
+[INFO] Copying webapp resources [C:\Users\monte\Downloads\GITHUB\parkutp-proyweb\parkutp-proyweb\parkutp\src\main\webapp]
+[INFO] Building war: C:\Users\monte\Downloads\GITHUB\parkutp-proyweb\parkutp-proyweb\parkutp\target\parkutp-apf2.war
+[INFO] 
+[INFO] --- spring-boot:3.2.5:repackage (repackage) @ parkutp ---
+[INFO] Replacing main artifact C:\Users\monte\Downloads\GITHUB\parkutp-proyweb\parkutp-proyweb\parkutp\target\parkutp-apf2.war with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to C:\Users\monte\Downloads\GITHUB\parkutp-proyweb\parkutp-proyweb\parkutp\target\parkutp-apf2.war.original
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  16.645 s
+[INFO] Finished at: 2026-10-08T14:21:46-05:00
+[INFO] ------------------------------------------------------------------------

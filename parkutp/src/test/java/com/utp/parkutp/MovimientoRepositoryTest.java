@@ -11,7 +11,18 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest(properties = { "spring.sql.init.mode=never", "spring.jpa.hibernate.ddl-auto=create-drop" })
+@org.springframework.test.context.TestExecutionListeners({
+ org.springframework.test.context.support.DependencyInjectionTestExecutionListener.class,
+ org.springframework.test.context.support.DirtiesContextTestExecutionListener.class,
+ org.springframework.test.context.transaction.TransactionalTestExecutionListener.class
+})
 class MovimientoRepositoryTest {
+    @org.junit.jupiter.api.BeforeEach
+    void relaciones() {
+        jdbc.update("INSERT INTO sede(id,nombre) VALUES ('AQP','Arequipa')");
+        jdbc.update("INSERT INTO estacionamiento(id,sede_id,nombre,capacidad,activo) VALUES (1,'AQP','Uno',100,true),(2,'AQP','Dos',100,true)");
+        jdbc.update("INSERT INTO acceso(id,estacionamiento_id,nombre,tipo) VALUES (1,1,'Entrada uno','ENTRADA'),(2,2,'Entrada dos','ENTRADA')");
+    }
     @Autowired
     MovimientoRepository repository;
     @Autowired
@@ -21,7 +32,7 @@ class MovimientoRepositoryTest {
         UUID evento = UUID.randomUUID();
         jdbc.update(
                 "INSERT INTO movimiento(evento_id,estacionamiento_id,acceso_id,tipo,origen,placa,registrado_en) VALUES (?,?,?,?,?,?,?)",
-                evento, estacionamiento, 1L, tipo, "MANUAL", placa, OffsetDateTime.parse(fecha));
+                evento, estacionamiento, estacionamiento, tipo, "MANUAL", placa, OffsetDateTime.parse(fecha));
         return evento;
     }
 

@@ -1,6 +1,6 @@
 # ParkUTP — Avance 2
 
-Evolución del proyecto APF1 para gestionar los estacionamientos de la UTP Arequipa. Conserva la API de sedes y añade persistencia PostgreSQL mediante JDBC, CRUD de estacionamientos, interfaz JSP/Bootstrap y un formulario JSF de sedes. Dos accesos separados: uno de entrada y otro de salida.
+Evolución del proyecto APF1 para gestionar los estacionamientos de la UTP Arequipa. Conserva la API de sedes y añade persistencia PostgreSQL mediante JPA para sedes, estacionamientos y accesos, CRUD de estacionamientos, interfaz JSP/Bootstrap y un formulario JSF de sedes. Dos accesos separados: uno de entrada y otro de salida.
 
 ## Ejecutar en Windows
 
@@ -41,20 +41,20 @@ view              SedeBean: formulario JSF administrado por Spring/JoinFaces
 dto               Datos de entrada y validaciones
 model             Sede, Estacionamiento, Movimiento
 service           Reglas de negocio y límites transaccionales
-dao               SQL mediante JdbcTemplate y adaptación al repositorio de movimientos
-entity            MovimientoEntity: mapeo JPA de la tabla movimiento
-repository        Lectura de movimientos con Spring Data JPA y JPQL
+dao               Adaptadores JPA; el INSERT de movimientos sigue con JDBC
+entity            Sede, Estacionamiento, Acceso, Dispositivo y Movimiento mapeados con JPA
+repository        CRUD Spring Data JPA y consultas JPQL de historial y aforo
 src/main/webapp   JSP en WEB-INF y Facelet sedes.xhtml
 resources         Esquema PostgreSQL, estilos y JS de operación
 ```
 
-No hay SQL en los controllers, JSP ni el bean JSF. La migración a JPA/Hibernate comenzó con la lectura del historial y la búsqueda de eventos repetidos; las escrituras y los demás CRUD todavía utilizan JdbcTemplate. El WAR permite ejecutar JSP con Tomcat embebido. JoinFaces integra Jakarta Faces 4 con Spring Boot 3.2.5. El término Managed Bean se implementa como bean administrado por Spring, visible en EL de JSF; no se usa la anotación histórica `javax.faces.bean.ManagedBean` de versiones antiguas.
+No hay SQL en los controllers, JSP ni el bean JSF. Los CRUD de sede, estacionamiento y acceso usan JPA/Hibernate. El historial y aforo se consultan por JPQL; el INSERT de movimientos todavía utiliza JdbcTemplate durante la migración de Sergio. El WAR permite ejecutar JSP con Tomcat embebido. JoinFaces integra Jakarta Faces 4 con Spring Boot 3.2.5. El término Managed Bean se implementa como bean administrado por Spring, visible en EL de JSF; no se usa la anotación histórica `javax.faces.bean.ManagedBean` de versiones antiguas.
 
 ## Adecuación al checklist APF2
 
 Primera etapa implementada: entidad de movimientos, repositorio de lectura y consulta JPQL del historial con filtros antes del límite de 50 resultados. Hibernate no modifica el esquema existente. Detalles y verificación en [Migración del historial a JPQL](docs/JPQL-historial.md).
 
-Para completar el checklist todavía faltan los CRUD mediante JPA/Hibernate, completar la operación de negocio con la persistencia migrada, Spring Security con roles, autenticación JWT y las pruebas de autorización correspondientes. Esta etapa no completa por sí sola el APF2.
+El CRUD JPA y la creación transaccional de estacionamiento y accesos están implementados. Detalles y pruebas del aporte de Melissa en [Persistencia JPA](docs/Persistencia-JPA-Melissa.md). Falta completar la escritura JPA de movimientos y agregar Spring Security con roles, JWT y sus pruebas de autorización.
 
 ## Funciones actuales
 
@@ -62,7 +62,7 @@ Para completar el checklist todavía faltan los CRUD mediante JPA/Hibernate, com
 |---|---|
 | CRUD de entidad principal | Estacionamiento: crear, listar, editar, eliminar desde JSP y REST |
 | MVC, DAO, DTO | Paquetes separados, Service como capa adicional de negocio |
-| Base de datos real con JDBC | PostgreSQL + JdbcTemplate + SQL parametrizado |
+| Persistencia JPA | PostgreSQL + Hibernate + repositorios; escritura de movimientos aún JDBC |
 | Validaciones | Bean Validation, restricciones SQL y reglas de negocio |
 | Bootstrap + JSP sin scriptlets | Vistas JSP con HTML, JSTL y EL; sin etiquetas Spring de formulario |
 | JSF + Managed Bean | Registrar Sede con SedeBean y Facelet |
