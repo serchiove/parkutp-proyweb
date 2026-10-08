@@ -1,5 +1,7 @@
 # Primera etapa de Sergio: historial mediante JPA y JPQL
 
+Este documento describe la primera entrega. La etapa siguiente completa la escritura JPA y utiliza las entidades integradas por Melissa: ver [Registro de movimientos](Registro-movimientos-JPA.md). Actualmente Hibernate valida el esquema con `ddl-auto=validate`.
+
 El historial de movimientos y la búsqueda de eventos por UUID ahora utilizan Spring Data JPA. La pantalla de operación y la ruta `GET /api/estacionamientos/{id}/movimientos` conservan sus filtros y su formato de respuesta.
 
 ## Cambios

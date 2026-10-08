@@ -18,7 +18,8 @@ public class MovimientoEntity {
     private long estacionamientoId;
     @Column(name = "acceso_id", nullable = false)
     private long accesoId;
-    // Relaciones de solo lectura: conserva los campos y consultas existentes de Sergio.
+    // Relaciones de solo lectura: conserva los campos y consultas existentes de
+    // Sergio.
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "estacionamiento_id", insertable = false, updatable = false)
     private EstacionamientoEntity estacionamiento;
@@ -31,10 +32,21 @@ public class MovimientoEntity {
     private String origen;
     @Column(length = 12)
     private String placa;
-    @Column(name = "registrado_en", nullable = false)
+    @org.hibernate.annotations.Generated(event = org.hibernate.generator.EventType.INSERT)
+    @Column(name = "registrado_en", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime registradoEn;
 
     protected MovimientoEntity() {
+    }
+
+    public MovimientoEntity(UUID eventoId, long estacionamientoId, long accesoId, String tipo,
+            String origen, String placa) {
+        this.eventoId = eventoId;
+        this.estacionamientoId = estacionamientoId;
+        this.accesoId = accesoId;
+        this.tipo = tipo;
+        this.origen = origen;
+        this.placa = placa;
     }
 
     public Movimiento toModel() {

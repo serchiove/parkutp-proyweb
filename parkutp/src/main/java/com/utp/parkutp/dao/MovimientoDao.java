@@ -4,7 +4,6 @@ import com.utp.parkutp.model.Movimiento;
 import com.utp.parkutp.entity.MovimientoEntity;
 import com.utp.parkutp.repository.MovimientoRepository;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.Repository;
 import java.time.OffsetDateTime;
 import java.time.LocalDate;
@@ -13,15 +12,9 @@ import java.util.*;
 
 @Repository
 public class MovimientoDao {
-    private final JdbcTemplate jdbc;
     private final MovimientoRepository repository;
-    private final RowMapper<Movimiento> mapper = (rs, n) -> new Movimiento(rs.getLong("id"),
-            rs.getObject("evento_id", UUID.class), rs.getLong("estacionamiento_id"), rs.getLong("acceso_id"),
-            rs.getString("tipo"), rs.getString("origen"), rs.getString("placa"),
-            rs.getObject("registrado_en", OffsetDateTime.class));
 
-    public MovimientoDao(JdbcTemplate jdbc, MovimientoRepository repository) {
-        this.jdbc = jdbc;
+    public MovimientoDao(MovimientoRepository repository) {
         this.repository = repository;
     }
 
@@ -31,9 +24,8 @@ public class MovimientoDao {
 
     public Movimiento insertar(UUID evento, long estacionamiento, long acceso, String tipo, String origen,
             String placa) {
-        return jdbc.queryForObject(
-                "INSERT INTO movimiento(evento_id,estacionamiento_id,acceso_id,tipo,origen,placa) VALUES (?,?,?,?,?,?) RETURNING *",
-                mapper, evento, estacionamiento, acceso, tipo, origen, placa);
+        return repository.saveAndFlush(new MovimientoEntity(evento, estacionamiento, acceso, tipo, origen, placa))
+                .toModel();
     }
 
     public List<Movimiento> recientes(long id) {
@@ -50,6 +42,6 @@ public class MovimientoDao {
         String placaNormalizada = placa == null || placa.isBlank() ? null : placa.trim().toUpperCase(Locale.ROOT);
         String tipoNormalizado = tipo == null || tipo.isBlank() ? null : tipo;
         return repository.buscarHistorial(id, desde, hasta, placaNormalizada, tipoNormalizado, PageRequest.of(0, 50))
-            .stream().map(MovimientoEntity::toModel).toList();
+                .stream().map(MovimientoEntity::toModel).toList();
     }
 }
