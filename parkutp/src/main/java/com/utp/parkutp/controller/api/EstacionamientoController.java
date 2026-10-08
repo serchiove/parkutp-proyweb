@@ -4,9 +4,11 @@ import com.utp.parkutp.dto.*;
 import com.utp.parkutp.model.*;
 import com.utp.parkutp.service.*;
 import jakarta.validation.Valid;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.net.URI;
 import java.util.List;
 import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -35,7 +37,8 @@ public class EstacionamientoController {
     @PostMapping
     public ResponseEntity<Estacionamiento> crear(@Valid @RequestBody EstacionamientoDto dto) {
         Estacionamiento e = service.crear(dto);
-        return ResponseEntity.created(URI.create("/api/estacionamientos/" + e.id())).body(e);
+        return ResponseEntity.status(HttpStatus.CREATED)
+        .header(HttpHeaders.LOCATION, "/api/estacionamientos/" + e.id()).body(e);
     }
 
     @PutMapping("/{id}")

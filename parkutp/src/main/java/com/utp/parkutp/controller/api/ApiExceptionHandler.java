@@ -12,7 +12,7 @@ import java.util.Map;
 public class ApiExceptionHandler {
     @ExceptionHandler(NegocioException.class)
     public ResponseEntity<?> negocio(NegocioException ex) {
-        return ResponseEntity.status(ex.getStatus()).body(Map.of("mensaje", ex.getMessage()));
+        return ResponseEntity.status(ex.getStatus().value()).body(Map.of("mensaje", ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

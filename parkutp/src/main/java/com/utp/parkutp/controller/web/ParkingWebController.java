@@ -31,20 +31,26 @@ public class ParkingWebController {
     @GetMapping("/estacionamientos")
     public String listar(Model model) {
         var lista = service.listar();
+        int capacidad = 0, ocupados = 0, disponibles = 0;
+        for (Estacionamiento e : lista) {
+            if (!e.activo())
+                continue;
+            capacidad += e.capacidad();
+            ocupados += e.ocupados();
+            disponibles += e.getDisponibles();
+        }
         model.addAttribute("estacionamientos", lista);
-        model.addAttribute("totalCapacidad",
-                lista.stream().filter(Estacionamiento::activo).mapToInt(Estacionamiento::capacidad).sum());
-        model.addAttribute("totalOcupados",
-                lista.stream().filter(Estacionamiento::activo).mapToInt(Estacionamiento::ocupados).sum());
-        model.addAttribute("totalDisponibles",
-                lista.stream().filter(Estacionamiento::activo).mapToInt(Estacionamiento::getDisponibles).sum());
+        model.addAttribute("totalCapacidad", capacidad);
+        model.addAttribute("totalOcupados", ocupados);
+        model.addAttribute("totalDisponibles", disponibles);
         return "estacionamientos/lista";
     }
 
     @GetMapping("/estacionamientos/nuevo")
     public String nuevo(Model model) {
-        model.addAttribute("form", new EstacionamientoDto());
-        return formulario(model, null);
+        var dto = new EstacionamientoDto();
+        model.addAttribute("form", dto);
+        return formulario(model, null, dto);
     }
 
     @GetMapping("/estacionamientos/{id}/editar")
@@ -56,13 +62,12 @@ public class ParkingWebController {
         dto.setCapacidad(e.capacidad());
         dto.setActivo(e.activo());
         model.addAttribute("form", dto);
-        return formulario(model, id);
+        return formulario(model, id, dto);
     }
 
-    private String formulario(Model model, Long id) {
+    private String formulario(Model model, Long id, EstacionamientoDto dto) {
         model.addAttribute("sedes", sedes.listar());
         model.addAttribute("id", id);
-        var dto = (EstacionamientoDto) model.getAttribute("form");
         var result = (BindingResult) model.getAttribute(BindingResult.MODEL_KEY_PREFIX + "form");
         var valores = new java.util.HashMap<String, Object>();
         valores.put("sedeId", result == null ? dto.getSedeId() : result.getFieldValue("sedeId"));
@@ -79,12 +84,13 @@ public class ParkingWebController {
     public String crear(@Valid @ModelAttribute("form") EstacionamientoDto dto, BindingResult result, Model model,
             RedirectAttributes flash) {
         if (result.hasErrors())
-            return formulario(model, null);
+            return formulario(model, null, dto);
         try {
             service.crear(dto);
         } catch (NegocioException ex) {
-            result.reject("negocio", ex.getMessage());
-            return formulario(model, null);
+            String mensaje = ex.getMessage();
+            result.reject("negocio", mensaje != null ? mensaje : "No se pudo completar la operación");
+            return formulario(model, null, dto);
         }
         flash.addFlashAttribute("mensaje", "Estacionamiento registrado con sus dos accesos");
         return "redirect:/estacionamientos";
@@ -94,12 +100,13 @@ public class ParkingWebController {
     public String actualizar(@PathVariable long id, @Valid @ModelAttribute("form") EstacionamientoDto dto,
             BindingResult result, Model model, RedirectAttributes flash) {
         if (result.hasErrors())
-            return formulario(model, id);
+            return formulario(model, id, dto);
         try {
             service.actualizar(id, dto);
         } catch (NegocioException ex) {
-            result.reject("negocio", ex.getMessage());
-            return formulario(model, id);
+            String mensaje = ex.getMessage();
+            result.reject("negocio", mensaje != null ? mensaje : "No se pudo completar la operación");
+            return formulario(model, id, dto);
         }
         flash.addFlashAttribute("mensaje", "Estacionamiento actualizado");
         return "redirect:/estacionamientos";

@@ -4,7 +4,7 @@ import com.utp.parkutp.dao.*;
 import com.utp.parkutp.dto.MovimientoDto;
 import com.utp.parkutp.exception.NegocioException;
 import com.utp.parkutp.model.*;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
@@ -60,7 +60,7 @@ public class MovimientoService {
         try {
             return dao.insertar(dto.getEventoId(), id, accesos.acceso(id, dto.getTipo()), dto.getTipo(),
                     dto.getOrigen(), placa);
-        } catch (DuplicateKeyException ex) {
+        } catch (DataIntegrityViolationException ex) {
             throw NegocioException.conflicto("El identificador del evento ya existe; comprueba los datos");
         }
     }

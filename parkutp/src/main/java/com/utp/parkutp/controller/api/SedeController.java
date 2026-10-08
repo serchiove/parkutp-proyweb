@@ -4,9 +4,11 @@ import com.utp.parkutp.dto.SedeDto;
 import com.utp.parkutp.model.Sede;
 import com.utp.parkutp.service.SedeService;
 import jakarta.validation.Valid;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -31,7 +33,8 @@ public class SedeController {
     @PostMapping
     public ResponseEntity<Sede> crear(@Valid @RequestBody SedeDto dto) {
         Sede s = service.crear(dto);
-        return ResponseEntity.created(URI.create("/api/sedes/" + s.id())).body(s);
+        return ResponseEntity.status(HttpStatus.CREATED)
+        .header(HttpHeaders.LOCATION, "/api/sedes/" + s.id()).body(s);
     }
 
     @PutMapping("/{id}")

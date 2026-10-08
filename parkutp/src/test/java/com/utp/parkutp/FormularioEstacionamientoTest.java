@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -39,11 +40,11 @@ class FormularioEstacionamientoTest {
     }
 
     @Test void conservaDatosYExplicaCapacidadNoNumerica() throws Exception {
-        var resultado = mvc.perform(post("/estacionamientos")
+                var resultado = Objects.requireNonNull(mvc.perform(post("/estacionamientos")
                 .param("sedeId", "AQP").param("nombre", "Zona <principal>")
                 .param("capacidad", "abc").param("_activo", "on"))
                 .andExpect(status().isOk()).andExpect(view().name("estacionamientos/formulario"))
-                .andReturn().getModelAndView().getModel();
+                .andReturn().getModelAndView()).getModel();
         var valores = (Map<?, ?>) resultado.get("valores");
         assertEquals("abc", valores.get("capacidad"));
         assertEquals("Zona <principal>", valores.get("nombre"));
