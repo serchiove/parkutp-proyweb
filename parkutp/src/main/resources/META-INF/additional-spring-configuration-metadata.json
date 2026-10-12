@@ -1,0 +1,20 @@
+{
+  "properties": [
+    {
+      "name": "parkutp.jwt.secret",
+      "type": "java.lang.String",
+      "description": "Clave HMAC para firmar los JWT. Se define con la variable de entorno JWT_SECRET (mínimo 32 caracteres)."
+    },
+    {
+      "name": "parkutp.jwt.expiracion-minutos",
+      "type": "java.lang.Long",
+      "description": "Minutos de vigencia del token JWT.",
+      "defaultValue": 60
+    },
+    {
+      "name": "parkutp.demo.password",
+      "type": "java.lang.String",
+      "description": "Contraseña de las cuentas de demostración. Se define con la variable de entorno DEMO_PASSWORD."
+    }
+  ]
+}
