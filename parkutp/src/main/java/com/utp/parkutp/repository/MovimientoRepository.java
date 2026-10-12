@@ -20,10 +20,21 @@ public interface MovimientoRepository extends Repository<MovimientoEntity, Long>
         @Query("select coalesce(sum(case when m.tipo='ENTRADA' then 1 else -1 end),0) from MovimientoPersistido m where m.estacionamientoId=:id")
         long ocupados(@Param("id") long id);
 
+        @Query("""
+                        select coalesce(sum(case when m.tipo = 'ENTRADA' then 1 else -1 end), 0)
+                        from MovimientoPersistido m
+                        where m.estacionamientoId = :id and (m.placa is null or trim(m.placa) = '')
+                        """)
+        long ocupadosSinPlaca(@Param("id") long id);
+
         @Query("select count(m) from MovimientoPersistido m where m.estacionamientoId=:id")
         long contarPorEstacionamiento(@Param("id") long id);
 
         Optional<MovimientoEntity> findByEventoId(UUID eventoId);
+
+        // El ID conserva el orden de registro, incluso si se ajusta una fecha histórica.
+        Optional<MovimientoEntity> findFirstByEstacionamientoIdAndPlacaIgnoreCaseOrderByIdDesc(
+                        long estacionamientoId, String placa);
 
         default List<MovimientoEntity> buscarHistorial(long estacionamientoId, OffsetDateTime desde,
                         OffsetDateTime hasta, String placa, String tipo, Pageable limite) {

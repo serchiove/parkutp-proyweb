@@ -30,6 +30,158 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     DirtiesContextTestExecutionListener.class })
 @EnabledIfEnvironmentVariable(named = "TEST_DB_URL", matches = ".*")
 class ParkutpIntegrationTest {
+  @Test
+  void salidaSinPlacaNoDescuentaUnVehiculoIdentificado() throws Exception {
+    long id = estacionamientos.crear(estacionamiento(3)).id();
+    movimientos.registrar(id, conPlaca("ENTRADA", "ABC-123"));
+    movimientos.registrar(id, conPlaca("ENTRADA", "ABC-133"));
+    movimientos.registrar(id, conPlaca("SALIDA", "ABC-133"));
+    movimientos.registrar(id, movimiento("ENTRADA", UUID.randomUUID()));
+    movimientos.registrar(id, movimiento("SALIDA", UUID.randomUUID()));
+    mvc.perform(post("/api/estacionamientos/" + id + "/movimientos").contentType("application/json")
+        .content("{\"eventoId\":\"" + UUID.randomUUID()
+            + "\",\"tipo\":\"SALIDA\",\"origen\":\"MANUAL\",\"placa\":null}"))
+        .andExpect(status().isConflict());
+    assertEquals(1, estacionamientos.buscar(id).ocupados());
+    assertEquals(5, movimientos.recientes(id).size());
+    movimientos.registrar(id, conPlaca("SALIDA", "ABC-123"));
+    assertEquals(0, estacionamientos.buscar(id).ocupados());
+  }
+
+  @Test
+  void reintentoDeSalidaAnonimaDevuelveElMismoEventoSinDescontarOtraVez() {
+    long id = estacionamientos.crear(estacionamiento(2)).id();
+    movimientos.registrar(id, conPlaca("ENTRADA", "ABC-123"));
+    movimientos.registrar(id, movimiento("ENTRADA", UUID.randomUUID()));
+    var salida = movimiento("SALIDA", UUID.randomUUID());
+    var registrada = movimientos.registrar(id, salida);
+    assertEquals(registrada.id(), movimientos.registrar(id, salida).id());
+    assertEquals(1, estacionamientos.buscar(id).ocupados());
+    assertEquals(3, movimientos.recientes(id).size());
+  }
+
+  @Test
+  void salidasAnonimasSimultaneasSoloConsumenElIngresoAnonimo() throws Exception {
+    long id = estacionamientos.crear(estacionamiento(3)).id();
+    movimientos.registrar(id, conPlaca("ENTRADA", "ABC-123"));
+    movimientos.registrar(id, movimiento("ENTRADA", UUID.randomUUID()));
+    var listas = new CountDownLatch(2); var iniciar = new CountDownLatch(1);
+    var pool = Executors.newFixedThreadPool(2);
+    Callable<Boolean> registrar = () -> {
+      listas.countDown(); iniciar.await(5, TimeUnit.SECONDS);
+      try { movimientos.registrar(id, movimiento("SALIDA", UUID.randomUUID())); return true; }
+      catch (NegocioException ex) { return false; }
+    };
+    try {
+      var a = pool.submit(registrar); var b = pool.submit(registrar);
+      assertTrue(listas.await(5, TimeUnit.SECONDS)); iniciar.countDown();
+      assertNotEquals(a.get(10, TimeUnit.SECONDS), b.get(10, TimeUnit.SECONDS));
+      assertEquals(1, estacionamientos.buscar(id).ocupados());
+      assertEquals(3, movimientos.recientes(id).size());
+    } finally { pool.shutdownNow(); }
+  }
+
+  @Test
+  void ingresoAnonimoDeOtraZonaNoAutorizaSalidaLocal() {
+    long uno = estacionamientos.crear(estacionamiento(2)).id();
+    var dto = estacionamiento(2); dto.setNombre("Otra zona");
+    long dos = estacionamientos.crear(dto).id();
+    movimientos.registrar(uno, conPlaca("ENTRADA", "ABC-123"));
+    movimientos.registrar(dos, movimiento("ENTRADA", UUID.randomUUID()));
+    assertThrows(NegocioException.class, () -> movimientos.registrar(uno, movimiento("SALIDA", UUID.randomUUID())));
+    assertEquals(1, estacionamientos.buscar(uno).ocupados());
+    assertEquals(1, estacionamientos.buscar(dos).ocupados());
+  }
+
+  private MovimientoDto conPlaca(String tipo, String placa) {
+    var dto = movimiento(tipo, UUID.randomUUID());
+    dto.setPlaca(placa);
+    return dto;
+  }
+
+  @Test
+  void segundaSalidaDeUnaPlacaNoDescuentaOtroVehiculo() throws Exception {
+    long id = estacionamientos.crear(estacionamiento(2)).id();
+    movimientos.registrar(id, conPlaca("ENTRADA", "ABC"));
+    movimientos.registrar(id, conPlaca("ENTRADA", "ABC2"));
+    movimientos.registrar(id, conPlaca("SALIDA", "ABC2"));
+    var segundaSalida = conPlaca("SALIDA", "ABC2");
+    mvc.perform(post("/api/estacionamientos/" + id + "/movimientos").contentType("application/json")
+        .content("{\"eventoId\":\"" + segundaSalida.getEventoId()
+            + "\",\"tipo\":\"SALIDA\",\"origen\":\"MANUAL\",\"placa\":\"ABC2\"}"))
+        .andExpect(status().isConflict());
+    assertEquals(1, estacionamientos.buscar(id).ocupados());
+    assertEquals(3, movimientos.recientes(id).size());
+    movimientos.registrar(id, conPlaca("SALIDA", "ABC"));
+    assertEquals(0, estacionamientos.buscar(id).ocupados());
+  }
+
+  @Test
+  void noAdmiteEntradaDuplicadaIgnorandoMayusculas() {
+    long id = estacionamientos.crear(estacionamiento(3)).id();
+    movimientos.registrar(id, conPlaca("ENTRADA", "abc-123"));
+    assertThrows(NegocioException.class, () -> movimientos.registrar(id, conPlaca("ENTRADA", "ABC-123")));
+    assertEquals(1, estacionamientos.buscar(id).ocupados());
+    assertEquals(1, movimientos.recientes(id).size());
+  }
+
+  @Test
+  void placaSinEntradaNoPuedeSalirAunqueExistanCrucesSinPlaca() {
+    long id = estacionamientos.crear(estacionamiento(3)).id();
+    movimientos.registrar(id, movimiento("ENTRADA", UUID.randomUUID()));
+    assertThrows(NegocioException.class, () -> movimientos.registrar(id, conPlaca("SALIDA", "ABC-123")));
+    assertEquals(1, estacionamientos.buscar(id).ocupados());
+    movimientos.registrar(id, movimiento("SALIDA", UUID.randomUUID()));
+    assertEquals(0, estacionamientos.buscar(id).ocupados());
+  }
+
+  @Test
+  void placaPuedeReingresarYReintentosNoCambianSuEstado() {
+    long id = estacionamientos.crear(estacionamiento(2)).id();
+    var entrada = conPlaca("ENTRADA", "ABC-123");
+    var registrada = movimientos.registrar(id, entrada);
+    assertEquals(registrada.id(), movimientos.registrar(id, entrada).id());
+    var salida = conPlaca("SALIDA", "ABC-123");
+    movimientos.registrar(id, salida);
+    assertEquals(registrada.id(), movimientos.registrar(id, entrada).id());
+    assertEquals(0, estacionamientos.buscar(id).ocupados());
+    movimientos.registrar(id, conPlaca("ENTRADA", "ABC-123"));
+    movimientos.registrar(id, salida); // Reintento de la salida anterior, no es otro cruce.
+    assertEquals(1, estacionamientos.buscar(id).ocupados());
+    assertEquals(3, movimientos.recientes(id).size());
+  }
+
+  @Test
+  void placaSeValidaEnElEstacionamientoIndicado() {
+    long uno = estacionamientos.crear(estacionamiento(3)).id();
+    var dto = estacionamiento(3); dto.setNombre("Otro");
+    long dos = estacionamientos.crear(dto).id();
+    movimientos.registrar(uno, conPlaca("ENTRADA", "ABC-123"));
+    movimientos.registrar(dos, movimiento("ENTRADA", UUID.randomUUID()));
+    assertThrows(NegocioException.class, () -> movimientos.registrar(dos, conPlaca("SALIDA", "ABC-123")));
+    assertEquals(1, estacionamientos.buscar(uno).ocupados());
+    assertEquals(1, estacionamientos.buscar(dos).ocupados());
+  }
+
+  @Test
+  void entradasSimultaneasDeLaMismaPlacaSoloRegistranUna() throws Exception {
+    long id = estacionamientos.crear(estacionamiento(3)).id();
+    var listas = new CountDownLatch(2); var iniciar = new CountDownLatch(1);
+    var pool = Executors.newFixedThreadPool(2);
+    Callable<Boolean> registrar = () -> {
+      listas.countDown(); iniciar.await(5, TimeUnit.SECONDS);
+      try { movimientos.registrar(id, conPlaca("ENTRADA", "ABC-123")); return true; }
+      catch (NegocioException ex) { return false; }
+    };
+    try {
+      var a = pool.submit(registrar); var b = pool.submit(registrar);
+      assertTrue(listas.await(5, TimeUnit.SECONDS)); iniciar.countDown();
+      assertNotEquals(a.get(10, TimeUnit.SECONDS), b.get(10, TimeUnit.SECONDS));
+      assertEquals(1, estacionamientos.buscar(id).ocupados());
+      assertEquals(1, movimientos.recientes(id).size());
+    } finally { pool.shutdownNow(); }
+  }
+
   @Autowired
   AccesoService accesos;
 

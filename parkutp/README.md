@@ -78,13 +78,14 @@ El aporte de operación incorpora porcentaje de ocupación, barra de aforo, filt
 - Aforo calculado a partir de movimientos confirmados, sin contador duplicado.
 - Bloqueo de la fila del estacionamiento durante cada operación: evita sobreaforo al registrar simultáneamente el último espacio.
 - Eventos UUID idempotentes: reenviar el mismo evento con los mismos datos no vuelve a contarlo.
+- Con placa, se rechazan entradas duplicadas y salidas sin entrada pendiente en esa zona. Detalles en [Control por placa](docs/Control-por-placa.md).
 - Una zona inactiva rechaza entradas pero permite salidas pendientes.
 - No reducir capacidad por debajo de ocupación ni eliminar una zona con historial. Se puede desactivar.
 - Schema de dispositivos preparado para una siguiente etapa.
 
 ## Alcance y límites
 
-Prototipo académico, todavía sin autenticación ni roles; no publicar como sistema de producción. La placa es opcional y referencial: aún no existe entidad Vehículo/Estadía, reconocimiento de placas ni validación de doble ingreso por placa. Los sensores físicos y LEDs no están conectados. El origen SIMULADOR identifica eventos de prueba, no dispositivos autenticados.
+Prototipo académico, todavía sin autenticación ni roles; no publicar como sistema de producción. La placa es opcional: al proporcionarla se comprueba el último movimiento de esa placa en el estacionamiento; una salida sin placa solo puede consumir una entrada pendiente sin placa de esa zona. Aún no existe entidad Vehículo/Estadía ni reconocimiento de placas. No se vincula una salida sin placa con un vehículo identificado, ni se comprueba la presencia de una placa en otras zonas. Los sensores físicos y LEDs no están conectados. El origen SIMULADOR identifica eventos de prueba, no dispositivos autenticados.
 
 El conteo comienza en cero. Antes de una prueba deben empezar con una zona vacía y coordinar que un cruce se registre una sola vez (manual o automático). Un sensor real detecta pasos sin saber si hay espacio; si ocurre un ingreso cuando está lleno o una salida sin ocupación, esta versión rechaza el registro. La integración real deberá conservar esos eventos como incidencias y permitir reconciliación auditada del aforo. También deberá gestionar eventos fuera de orden, desconexión y credenciales de dispositivo.
 
