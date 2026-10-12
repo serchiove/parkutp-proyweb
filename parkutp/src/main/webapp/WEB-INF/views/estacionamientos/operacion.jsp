@@ -78,8 +78,8 @@
                                     </select></div>
                                 <div class="col-md-6"><label for="placa" class="form-label">Placa opcional</label><input
                                         id="placa" class="form-control" maxlength="12" placeholder="Ej.: ABC-123">
-                                    <div class="form-text">El sensor de paso no identifica placas. Esta versión controla
-                                        el aforo total.</div>
+                                    <div class="form-text">Con placa se valida que el vehículo entre y salga una sola vez
+                                        por estadía en esta zona. Una salida sin placa requiere una entrada pendiente sin placa.</div>
                                 </div>
                             </div>
                             <div class="row g-3">

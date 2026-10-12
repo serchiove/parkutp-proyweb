@@ -40,7 +40,8 @@ public class MovimientoService {
     @Transactional
     public Movimiento registrar(long id, MovimientoDto dto) {
         estacionamientos.bloquear(id);
-        String placa = dto.getPlaca() == null ? null : dto.getPlaca().toUpperCase(Locale.ROOT);
+        String placa = dto.getPlaca() == null || dto.getPlaca().isBlank()
+                ? null : dto.getPlaca().trim().toUpperCase(Locale.ROOT);
         Optional<Movimiento> previo = dao.buscarEvento(dto.getEventoId());
         if (previo.isPresent()) {
             Movimiento m = previo.get();
@@ -48,6 +49,17 @@ public class MovimientoService {
                     || !Objects.equals(m.placa(), placa))
                 throw NegocioException.conflicto("El evento ya fue usado con otros datos");
             return m;
+        }
+        // Se consulta bajo el mismo bloqueo del aforo; dos cruces simultáneos de una placa
+        // no pueden validar ambos contra un estado anterior.
+        if (placa != null) {
+            boolean dentro = dao.placaDentro(id, placa);
+            if ("ENTRADA".equals(dto.getTipo()) && dentro)
+                throw NegocioException.conflicto("La placa " + placa + " ya está dentro de este estacionamiento");
+            if ("SALIDA".equals(dto.getTipo()) && !dentro)
+                throw NegocioException.conflicto("La placa " + placa + " no tiene una entrada pendiente en este estacionamiento");
+        } else if ("SALIDA".equals(dto.getTipo()) && dao.ocupadosSinPlaca(id) <= 0) {
+            throw NegocioException.conflicto("No hay entradas pendientes sin placa en este estacionamiento; indica la placa del vehículo que sale");
         }
         Estacionamiento e = estacionamientos.buscar(id);
         if ("ENTRADA".equals(dto.getTipo())) {

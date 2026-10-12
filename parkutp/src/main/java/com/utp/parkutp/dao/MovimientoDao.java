@@ -22,6 +22,15 @@ public class MovimientoDao {
         return repository.findByEventoId(evento).map(MovimientoEntity::toModel);
     }
 
+    public boolean placaDentro(long estacionamientoId, String placa) {
+        return repository.findFirstByEstacionamientoIdAndPlacaIgnoreCaseOrderByIdDesc(estacionamientoId, placa)
+                .map(m -> "ENTRADA".equals(m.toModel().tipo())).orElse(false);
+    }
+
+    public long ocupadosSinPlaca(long estacionamientoId) {
+        return repository.ocupadosSinPlaca(estacionamientoId);
+    }
+
     public Movimiento insertar(UUID evento, long estacionamiento, long acceso, String tipo, String origen,
             String placa) {
         return repository.saveAndFlush(new MovimientoEntity(evento, estacionamiento, acceso, tipo, origen, placa))
