@@ -608,6 +608,13 @@ Comprobamos el rollback mediante pruebas con fallos controlados. Utilizamos JPQL
 
 ## 11. Pruebas automatizadas
 
+Las capturas de la verificación están organizadas en:
+
+- [Seguridad](parkutp/evidencias/seguridad/): login, petición autorizada y respuestas 401/403.
+- [Persistencia](parkutp/evidencias/persistencia/): datos antes y después del reinicio.
+- [Pruebas](parkutp/evidencias/pruebas/): Java, JavaScript y rollback.
+- [Demostración](parkutp/evidencias/demo/): CRUD, aforo, movimientos, roles y filtro del historial.
+
 > [!WARNING]
 > La suite borra tablas de integración. TEST_DB_URL debe apuntar exclusivamente a `parkutp_test`. Tanto nuestro script como las pruebas verifican ese nombre.
 
