@@ -95,18 +95,26 @@ El conteo comienza en cero. Antes de una prueba deben empezar con una zona vací
 
 ## API
 
-| Método | Ruta | Resultado |
-|---|---|---|
-| GET | `/api/sedes` y `/api/sedes/{id}` | 200 / 404 |
-| POST | `/api/sedes` | 201 / 400 / 409 |
-| PUT | `/api/sedes/{id}` | 200 / 400 / 404 / 409 |
-| DELETE | `/api/sedes/{id}` | 204 / 404 / 409 |
-| GET | `/api/estacionamientos` y `/api/estacionamientos/{id}` | 200 / 404 |
-| POST | `/api/estacionamientos` | 201 / 400 / 404 / 409 |
-| PUT | `/api/estacionamientos/{id}` | 200 / 400 / 404 / 409 |
-| DELETE | `/api/estacionamientos/{id}` | 204 / 404 / 409 |
-| GET | `/api/estacionamientos/{id}/movimientos` | 200 / 404 |
-| POST | `/api/estacionamientos/{id}/movimientos` | 200 / 400 / 404 / 409 |
+| Método |                                         Ruta                                           |       Resultado       |
+|--------|----------------------------------------------------------------------------------------|-----------------------|
+| GET    | `/api/sedes` y `/api/sedes/{id}`                                                       | 200 / 404             |
+| POST   | `/api/sedes`                                                                           | 201 / 400 / 409       |
+| PUT    | `/api/sedes/{id}`                                                                      | 200 / 400 / 404 / 409 |
+| DELETE | `/api/sedes/{id}`                                                                      | 204 / 404 / 409       |
+| GET    | `/api/estacionamientos` y `/api/estacionamientos/{id}`                                 | 200 / 404             |
+| POST   | `/api/estacionamientos`                                                                | 201 / 400 / 404 / 409 |
+| PUT    | `/api/estacionamientos/{id}`                                                           | 200 / 400 / 404 / 409 |
+| DELETE | `/api/estacionamientos/{id}`                                                           | 204 / 404 / 409       |
+| GET    | `/api/estacionamientos/{id}/movimientos`                                               | 200 / 404             |
+| POST   | `/api/estacionamientos/{id}/movimientos`                                               | 200 / 400 / 404 / 409 |
+| GET    | `/api/estacionamientos/{id}/accesos` y `/api/estacionamientos/{id}/accesos/{accesoId}` | 200 / 404             |
+| POST   | `/api/estacionamientos/{id}/accesos`                                                   | 201 / 400 / 404 / 409 |
+| PUT    | `/api/estacionamientos/{id}/accesos/{accesoId}`                                        | 200 / 400 / 404 / 409 |
+| DELETE | `/api/estacionamientos/{id}/accesos/{accesoId}`                                        | 204 / 404 / 409       |
+
+Las rutas protegidas requieren `Authorization: Bearer <token>`.
+Sin un token válido responden 401; si el usuario no tiene el permiso
+necesario, responden 403. El login es público.
 
 Ejemplo estacionamiento:
 
@@ -122,6 +130,16 @@ Ejemplo ingreso; usar UUID nuevo por cruce y conservarlo al reintentar:
 
 ## Pruebas
 
+En la verificación realizada se aprobaron 72 pruebas Java y 10 pruebas
+JavaScript, sin fallos ni pruebas omitidas. También se comprobó el rollback
+y la permanencia de los datos después de reiniciar la aplicación.
+
+Las capturas están organizadas en [evidencias](evidencias/):
+- [Seguridad](evidencias/seguridad/): login, petición autorizada y errores 401/403.
+- [Persistencia](evidencias/persistencia/): datos antes y después del reinicio.
+- [Pruebas](evidencias/pruebas/): resultados de Java, JavaScript y rollback.
+- [Demostración](evidencias/demo/): CRUD, aforo, movimientos y roles.
+
 Resultados del cierre técnico en [Verificación APF2](docs/Verificacion-APF2.md). Para los roles y Postman, ver [Seguridad APF2](docs/Seguridad-APF2.md).
 
 ```powershell
@@ -132,7 +150,14 @@ $env:TEST_DB_PASSWORD = 'tu-clave'
 .\scripts\Probar.ps1
 ```
 
-Crear una base dedicada llamada `parkutp_test`. La suite trunca sus tablas antes de cada caso. Sin TEST_DB_URL se ejecutan las pruebas independientes de la base y se omite la integración; eso no verifica la persistencia con PostgreSQL ni las transacciones. La colección `postman/APF2-ParkUTP.postman_collection.json` prueba CRUD, errores, aforo e idempotencia. Las evidencias del APF1 se conservan como antecedentes; no son evidencia de pruebas del APF2.
+Crear una base dedicada llamada `parkutp_test`. El script `Probar.ps1`
+requiere configurar `TEST_DB_URL`, `TEST_DB_USER` y `TEST_DB_PASSWORD`.
+Si faltan `TEST_DB_URL` o `TEST_DB_USER`, el script se detiene. La suite
+trunca sus tablas antes de cada caso; no utilizar la base de trabajo.
+
+La colección `postman/APF2-ParkUTP.postman_collection.json` prueba CRUD,
+errores, aforo e idempotencia. Las evidencias del APF1 se conservan como
+antecedentes; no son evidencia de pruebas del APF2.
 
 ## Fuentes técnicas
 
