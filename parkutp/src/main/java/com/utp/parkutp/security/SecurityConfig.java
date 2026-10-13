@@ -1,12 +1,26 @@
 package com.utp.parkutp.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -17,12 +31,46 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // ETAPA 2a: la cadena todavía permite todo y CSRF está desactivado solo de forma
-    // temporal. La etapa 3 aplica JWT, roles, 401/403 y protege las vistas.
     @Bean
-    public SecurityFilterChain cadena(HttpSecurity http) throws Exception {
+    @Order(1)
+        public SecurityFilterChain cadenaApi(HttpSecurity http, JwtService jwt,
+            @Qualifier("corsConfigurationSource") CorsConfigurationSource cors) throws Exception {
+        http.securityMatcher(antMatcher("/api/**"))
+                .csrf(csrf -> csrf.disable())
+                .cors(c -> c.configurationSource(cors))
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new JwtAuthenticationFilter(jwt), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(new ApiAuthenticationEntryPoint())
+                        .accessDeniedHandler(new ApiAccessDeniedHandler()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(antMatcher(HttpMethod.OPTIONS, "/api/**")).permitAll()
+                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/auth/login")).permitAll()
+                        .requestMatchers(antMatcher(HttpMethod.GET, "/api/auth/yo")).authenticated()
+                        .anyRequest().permitAll());
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain cadenaVistas(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(
+            @Value("${CORS_ORIGENES:http://localhost:4200}") String origenes) {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.stream(origenes.split(","))
+                .map(String::trim).filter(o -> !o.isEmpty()).toList());
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowCredentials(false);
+        config.setMaxAge(3600L);
+        UrlBasedCorsConfigurationSource fuente = new UrlBasedCorsConfigurationSource();
+        fuente.registerCorsConfiguration("/api/**", config);
+        return fuente;
     }
 }
