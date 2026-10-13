@@ -2,18 +2,48 @@
     'use strict';
     const root = document.getElementById('operacion'), api = root.dataset.api;
     const byId = id => document.getElementById(id), buttons = [...document.querySelectorAll('.paso')];
-    const storageKey = 'parkutp-pendiente-' + root.dataset.id;
+    const puedeRegistrar = root.dataset.puedeRegistrar !== 'false';
+    const storageKey = 'parkutp-pendiente-' + (root.dataset.usuario || '') + '-' + root.dataset.id;
+    let token = null, promesaToken = null;
     let pendiente = null, enviando = false, estado = null, filtros = new URLSearchParams(), consultaHistorial = 0, consultaAforo = 0;
-    try { pendiente = JSON.parse(localStorage.getItem(storageKey)); } catch (_) { /* almacenamiento opcional */ }
+    try { if (puedeRegistrar) pendiente = JSON.parse(localStorage.getItem(storageKey)); } catch (_) { /* almacenamiento opcional */ }
     function guardar() { try { pendiente ? localStorage.setItem(storageKey, JSON.stringify(pendiente)) : localStorage.removeItem(storageKey); } catch (_) { } }
     function aviso(texto, clase = 'info') { const el = byId('aviso'); el.className = 'alert alert-' + clase; el.textContent = texto; }
     function controles() {
+        if (!puedeRegistrar) return;
         buttons.forEach(b => b.disabled = enviando || !!pendiente || !estado || (b.dataset.tipo === 'ENTRADA' ? (!estado.activo || estado.disponibles <= 0) : estado.ocupados <= 0));
         byId('reintentar').hidden = !pendiente; byId('reintentar').disabled = enviando;
         byId('restriccion').textContent = !estado ? 'Esperando conexión para registrar movimientos.' : pendiente ? 'Confirma el evento pendiente antes de registrar otro.' : !estado.activo ? 'Estacionamiento inactivo: solo se permiten salidas de vehículos que estén dentro.' : estado.disponibles <= 0 ? 'Estacionamiento lleno: solo se permiten salidas.' : estado.ocupados <= 0 ? 'Estacionamiento vacío: registra una entrada antes de una salida.' : '';
     }
+    async function obtenerToken() {
+        if (token) return token;
+        if (!promesaToken) promesaToken = (async () => {
+            const response = await fetch(root.dataset.tokenUrl || '/sesion/token', {
+                credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(10000)
+            });
+            if (response.status === 401) {
+                const error = new Error('Tu sesión terminó. Vuelve a iniciar sesión.');
+                error.http = true; error.sesion = true;
+                if (byId('sesion-vencida')) byId('sesion-vencida').hidden = false;
+                throw error;
+            }
+            if (!response.ok) throw new Error('No se pudo confirmar la sesión.');
+            const respuesta = await response.json();
+            if (typeof respuesta.token !== 'string' || !respuesta.token) throw new Error('No se pudo confirmar la sesión.');
+            token = respuesta.token;
+            return token;
+        })().finally(() => { promesaToken = null; });
+        return promesaToken;
+    }
     async function request(url, options = {}) {
-        const response = await fetch(url, { ...options, signal: AbortSignal.timeout(10000) });
+        const usado = await obtenerToken();
+        const llamar = jwt => fetch(url, { ...options, credentials: 'same-origin',
+            headers: { ...options.headers, Authorization: 'Bearer ' + jwt }, signal: AbortSignal.timeout(10000) });
+        let response = await llamar(usado);
+        if (response.status === 401) {
+            if (token === usado) token = null;
+            response = await llamar(await obtenerToken());
+        }
         const json = await response.json();
         if (!response.ok) { const error = new Error((json.errores || [json.mensaje || 'No se pudo completar la operación']).join('. ')); error.http = true; throw error; }
         return json;
@@ -48,14 +78,14 @@
         await Promise.all([actualizarAforo(), actualizarHistorial()]);
     }
     async function enviar() {
-        if (enviando || !pendiente) return;
+        if (!puedeRegistrar || enviando || !pendiente) return;
         enviando = true; controles();
         try { const movimiento = await request(api + '/movimientos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(pendiente) }); pendiente = null; guardar(); aviso((movimiento.tipo === 'ENTRADA' ? 'Entrada' : 'Salida') + ' confirmada' + (movimiento.placa ? ' · Placa ' + movimiento.placa : '') + '.', 'success'); }
         catch (error) { if (error.http) { pendiente = null; guardar(); aviso(error.message, 'danger'); } else aviso('No se confirmó el registro. Reintenta el mismo evento para evitar duplicados.', 'warning'); }
         finally { enviando = false; await actualizar(); }
     }
     buttons.forEach(button => button.addEventListener('click', () => { if (enviando || pendiente) return; pendiente = { eventoId: crypto.randomUUID(), tipo: button.dataset.tipo, origen: byId('origen').value, placa: byId('placa').value.trim().toUpperCase() || null }; guardar(); enviar(); }));
-    byId('reintentar').addEventListener('click', enviar);
+    if (puedeRegistrar) byId('reintentar').addEventListener('click', enviar);
     byId('filtros').addEventListener('submit', event => {
         event.preventDefault(); filtros = new URLSearchParams();
         for (const [key, value] of new FormData(event.currentTarget)) { const texto = value.trim(); if (texto) filtros.set(key, texto); }

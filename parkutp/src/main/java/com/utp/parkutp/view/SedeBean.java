@@ -17,6 +17,7 @@ public class SedeBean {
  public SedeBean(SedeService service) { this.service=service; }
  public SedeDto getForm() { return form; }
  public List<Sede> getSedes() { return service.listar(); }
+ @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
  public String guardar() {
   FacesContext context=FacesContext.getCurrentInstance();
   try {

@@ -9,6 +9,7 @@ Requisitos: JDK 21, PostgreSQL instalado y acceso a Maven Central en la primera 
 Desde esta carpeta, con PostgreSQL instalado y el puerto 55432 libre:
 
 ```powershell
+$env:DEMO_PASSWORD = [System.Net.NetworkCredential]::new('', (Read-Host 'Clave de cuentas demo' -AsSecureString)).Password
 .\scripts\Iniciar.ps1 -DemoLocal
 ```
 
@@ -25,18 +26,20 @@ $env:JAVA_HOME = 'C:\ruta\al\jdk-21'
 $env:DB_URL = 'jdbc:postgresql://localhost:5432/parkutp'
 $env:DB_USER = 'parkutp'
 $env:DB_PASSWORD = 'tu-clave'
+$env:DEMO_PASSWORD = [System.Net.NetworkCredential]::new('', (Read-Host 'Clave de cuentas demo' -AsSecureString)).Password
 .\scripts\Iniciar.ps1
 ```
 
 Crear antes la base `parkutp` y un usuario con permisos sobre ella; la aplicación crea las tablas si no existen. No guardar contraseñas en Git. `schema.sql` sirve para una instalación inicial; cambios futuros del esquema necesitarán migraciones.
 
-Abrir [Panel](http://localhost:8081/estacionamientos) y [Sedes JSF](http://localhost:8081/jsf/sedes.xhtml). Registrar primero una sede (ejemplo `AQP-PARRA` / `UTP Arequipa - Sede Parra`) y luego un estacionamiento con capacidad 20. No se incluyen capacidades reales ni datos institucionales inventados.
+Iniciar sesión con `admin`, `operador` o `consulta` y la clave indicada en DEMO_PASSWORD; las cuentas existentes no se sobrescriben. Abrir [Panel](http://localhost:8081/estacionamientos) y [Sedes JSF](http://localhost:8081/jsf/sedes.xhtml). Registrar primero una sede (ejemplo `AQP-PARRA` / `UTP Arequipa - Sede Parra`) y luego un estacionamiento con capacidad 20. No se incluyen capacidades reales ni datos institucionales inventados.
 
 ## Arquitectura y distribución
 
 ```text
 controller/web    MVC: formularios JSP y navegación
 controller/api    API REST y errores HTTP
+security          Roles, JWT, BCrypt, sesión web y autorización
 view              SedeBean: formulario JSF administrado por Spring/JoinFaces
 dto               Datos de entrada y validaciones
 model             Sede, Estacionamiento, Movimiento
@@ -54,7 +57,7 @@ No hay SQL en los controllers, JSP ni el bean JSF. Los CRUD de sede, estacionami
 
 Primera etapa implementada: entidad de movimientos, repositorio de lectura y consulta JPQL del historial con filtros antes del límite de 50 resultados. Hibernate no modifica el esquema existente. Detalles y verificación en [Migración del historial a JPQL](docs/JPQL-historial.md).
 
-El CRUD JPA y la creación transaccional de estacionamiento y accesos están implementados. Detalles y pruebas del aporte de Melissa en [Persistencia JPA](docs/Persistencia-JPA-Melissa.md). El registro transaccional de movimientos también usa JPA; detalles en [Registro de movimientos](docs/Registro-movimientos-JPA.md). Falta agregar Spring Security con roles, JWT y sus pruebas de autorización.
+El CRUD JPA y la creación transaccional de estacionamiento y accesos están implementados. Detalles y pruebas del aporte de Melissa en [Persistencia JPA](docs/Persistencia-JPA-Melissa.md). El registro transaccional de movimientos también usa JPA; detalles en [Registro de movimientos](docs/Registro-movimientos-JPA.md). Spring Security protege la web y la API con los roles ADMIN, OPERADOR y CONSULTA, login, sesiones, JWT y pruebas de autorización. Configuración y guion en [Seguridad APF2](docs/Seguridad-APF2.md).
 
 ## Funciones actuales
 
@@ -67,6 +70,7 @@ El CRUD JPA y la creación transaccional de estacionamiento y accesos están imp
 | Bootstrap + JSP sin scriptlets | Vistas JSP con HTML, JSTL y EL; sin etiquetas Spring de formulario |
 | JSF + Managed Bean | Registrar Sede con SedeBean y Facelet |
 | Lógica transaccional | Crear estacionamiento y dos accesos juntos; registro de paso y control de aforo |
+| Seguridad | Login, BCrypt, ADMIN/OPERADOR/CONSULTA, JWT en API y sesión/CSRF en web |
 
 ## Funciones adicionales
 
@@ -85,7 +89,7 @@ El aporte de operación incorpora porcentaje de ocupación, barra de aforo, filt
 
 ## Alcance y límites
 
-Prototipo académico, todavía sin autenticación ni roles; no publicar como sistema de producción. La placa es opcional: al proporcionarla se comprueba el último movimiento de esa placa en el estacionamiento; una salida sin placa solo puede consumir una entrada pendiente sin placa de esa zona. Aún no existe entidad Vehículo/Estadía ni reconocimiento de placas. No se vincula una salida sin placa con un vehículo identificado, ni se comprueba la presencia de una placa en otras zonas. Los sensores físicos y LEDs no están conectados. El origen SIMULADOR identifica eventos de prueba, no dispositivos autenticados.
+Prototipo académico con autenticación y roles. La web utiliza sesión y CSRF; la API exige JWT. Las cuentas de demostración no sustituyen la gestión de usuarios de un sistema de producción. La placa es opcional: al proporcionarla se comprueba el último movimiento de esa placa en el estacionamiento; una salida sin placa solo puede consumir una entrada pendiente sin placa de esa zona. Aún no existe entidad Vehículo/Estadía ni reconocimiento de placas. No se vincula una salida sin placa con un vehículo identificado, ni se comprueba la presencia de una placa en otras zonas. Los sensores físicos y LEDs no están conectados. El origen SIMULADOR identifica eventos de prueba, no dispositivos autenticados.
 
 El conteo comienza en cero. Antes de una prueba deben empezar con una zona vacía y coordinar que un cruce se registre una sola vez (manual o automático). Un sensor real detecta pasos sin saber si hay espacio; si ocurre un ingreso cuando está lleno o una salida sin ocupación, esta versión rechaza el registro. La integración real deberá conservar esos eventos como incidencias y permitir reconciliación auditada del aforo. También deberá gestionar eventos fuera de orden, desconexión y credenciales de dispositivo.
 
@@ -117,6 +121,8 @@ Ejemplo ingreso; usar UUID nuevo por cruce y conservarlo al reintentar:
 ```
 
 ## Pruebas
+
+Resultados del cierre técnico en [Verificación APF2](docs/Verificacion-APF2.md). Para los roles y Postman, ver [Seguridad APF2](docs/Seguridad-APF2.md).
 
 ```powershell
 $env:JAVA_HOME = 'C:\ruta\al\jdk-21'

@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="<c:url value='/webjars/bootstrap/5.3.3/css/bootstrap.min.css'/>">
 <link rel="stylesheet" href="<c:url value='/css/parkutp.css'/>">
 </head><body>
-<nav class="navbar navbar-dark park-nav"><div class="container"><a class="navbar-brand fw-bold" href="<c:url value='/estacionamientos'/>">Park<span>UTP</span><small>AREQUIPA</small></a><div class="d-flex gap-3"><a href="<c:url value='/estacionamientos'/>" class="nav-link text-white">Estacionamientos</a><a href="<c:url value='/jsf/sedes.xhtml'/>" class="nav-link text-white">Sedes</a></div></div></nav>
+<jsp:include page="/WEB-INF/views/fragments/navegacion.jsp"/>
 <main class="container py-4 py-md-5">
 
 <a href="<c:url value='/estacionamientos'/>" class="back-link">← Volver a estacionamientos</a>
@@ -13,6 +13,7 @@
 <c:if test="${empty sedes}"><div class="alert alert-warning">Necesitas una sede. <a href="<c:url value='/jsf/sedes.xhtml'/>">Regístrala aquí</a>.</div></c:if>
 <c:url var="accion" value="${empty id ? '/estacionamientos' : '/estacionamientos/'.concat(id)}"/>
 <form action="<c:out value='${accion}'/>" method="post">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 <c:if test="${not empty errores}"><div class="alert alert-danger" role="alert"><ul class="mb-0"><c:forEach var="error" items="${errores}"><li><c:out value="${error}"/></li></c:forEach></ul></div></c:if>
 <div class="mb-3"><label for="sedeId" class="form-label">Sede</label><select name="sedeId" id="sedeId" class="form-select">
 <option value="">Selecciona una sede</option>

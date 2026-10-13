@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@org.springframework.context.annotation.Import(TokenAdminDePrueba.class)
 // No utilizamos mocks: evita activar instrumentación de Mockito en esta suite
 // JDBC.
 @TestExecutionListeners({ ServletTestExecutionListener.class, DependencyInjectionTestExecutionListener.class,

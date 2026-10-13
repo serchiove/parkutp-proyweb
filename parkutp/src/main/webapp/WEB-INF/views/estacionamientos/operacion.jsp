@@ -12,18 +12,14 @@
             </head>
 
             <body>
-                <nav class="navbar navbar-dark park-nav">
-                    <div class="container"><a class="navbar-brand fw-bold"
-                            href="<c:url value='/estacionamientos'/>">Park<span>UTP</span><small>AREQUIPA</small></a>
-                        <div class="d-flex gap-3"><a href="<c:url value='/estacionamientos'/>"
-                                class="nav-link text-white">Estacionamientos</a><a
-                                href="<c:url value='/jsf/sedes.xhtml'/>" class="nav-link text-white">Sedes</a></div>
-                    </div>
-                </nav>
+                <jsp:include page="/WEB-INF/views/fragments/navegacion.jsp"/>
                 <main class="container py-4 py-md-5">
 
                     <a href="<c:url value='/estacionamientos'/>" class="back-link">← Volver al panel</a>
                     <div id="operacion" data-id="${estacionamiento.id}"
+                        data-token-url="<c:url value='/sesion/token'/>"
+                        data-usuario="<c:out value='${pageContext.request.userPrincipal.name}'/>"
+                        data-puede-registrar="${pageContext.request.isUserInRole('ADMIN') or pageContext.request.isUserInRole('OPERADOR')}"
                         data-api="<c:url value='/api/estacionamientos/${estacionamiento.id}'/>">
                         <div class="d-flex justify-content-between flex-wrap gap-3 mt-3 mb-4">
                             <div>
@@ -38,6 +34,8 @@
                             </div><span id="luz" class="status status-off">Consultando aforo</span>
                         </div>
                         <div id="aviso" role="status" aria-live="polite"></div>
+                        <div id="sesion-vencida" class="alert alert-warning" hidden>Tu sesión terminó.
+                            <a href="<c:url value='/login'/>">Vuelve a iniciar sesión</a>.</div>
                         <div class="row g-3 mb-4">
                             <div class="col-md-4">
                                 <div class="metric"><span>Capacidad</span><strong id="capacidad">
@@ -66,6 +64,7 @@
                             </div>
                             <p id="detalle-aforo" class="text-secondary mt-3 mb-0">Esperando el aforo actualizado.</p>
                         </section>
+                        <c:if test="${pageContext.request.isUserInRole('ADMIN') or pageContext.request.isUserInRole('OPERADOR')}">
                         <div class="parking-card mb-4">
                             <h2 class="h4">Registrar paso de un vehículo</h2>
                             <p class="text-secondary">Cada botón representa un cruce completo por su acceso. El
@@ -94,6 +93,10 @@
                             <p class="small text-secondary mt-3 mb-0">La luz mostrada es virtual. Esta versión todavía
                                 no está conectada a dispositivos físicos.</p>
                         </div>
+                        </c:if>
+                        <c:if test="${pageContext.request.isUserInRole('CONSULTA')}">
+                            <p class="alert alert-info">Tu cuenta permite consultar el aforo y el historial.</p>
+                        </c:if>
                         <div class="parking-card">
                             <h2 class="h4">Historial de movimientos</h2>
                             <p class="small text-secondary">Hasta 50 registros más recientes que coincidan con los
