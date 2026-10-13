@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
 
-function pantalla(estado = { capacidad: 10, ocupados: 8, disponibles: 2, activo: true }) {
+function pantalla(estado = { capacidad: 10, ocupados: 8, disponibles: 2, activo: true }, permisos = true, sesion = true) {
   const elementos = new Map(), consultas = [];
   function elemento(id = '') {
     return {
@@ -15,18 +15,21 @@ function pantalla(estado = { capacidad: 10, ocupados: 8, disponibles: 2, activo:
     };
   }
   const byId = id => { if (!elementos.has(id)) elementos.set(id, elemento(id)); return elementos.get(id); };
-  byId('operacion').dataset = { id: '1', api: '/api/estacionamientos/1' };
+  byId('operacion').dataset = { id: '1', api: '/api/estacionamientos/1', puedeRegistrar: String(permisos) };
   byId('origen').value = 'SIMULADOR';
   const botones = ['ENTRADA', 'SALIDA'].map(tipo => { const b = elemento(); b.dataset.tipo = tipo; return b; });
-  const entorno = { estado, movimientos: [], errorHistorial: false, resolverHistorial: null };
+  const entorno = { estado, movimientos: [], errorHistorial: false, resolverHistorial: null, peticiones: [], tokens: 0, expirar: false };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../src/main/resources/static/js/operacion.js'), 'utf8'), {
     document: { getElementById: byId, querySelectorAll: () => botones, createElement: () => elemento() },
     localStorage: { getItem: () => null, setItem() { }, removeItem() { } },
     Intl, Date, URLSearchParams, AbortSignal, crypto: { randomUUID: () => 'evento-prueba' },
     FormData: class { constructor() { return [['fecha', byId('filtro-fecha').value], ['placa', byId('filtro-placa').value], ['tipo', byId('filtro-tipo').value]]; } },
     setInterval(callback) { entorno.actualizar = callback; },
-    async fetch(url, options) {
+    async fetch(url, options = {}) {
       consultas.push(url);
+      entorno.peticiones.push({url, ...options});
+      if (url === '/sesion/token') { entorno.tokens++; return { ok: sesion, status: sesion ? 200 : 401, json: async () => ({token: 'jwt-' + entorno.tokens}) }; }
+      if (entorno.expirar) { entorno.expirar = false; return {ok: false, status: 401, json: async () => ({mensaje: 'Vencido'})}; }
       if (options.method === 'POST') return { ok: true, json: async () => JSON.parse(options.body) };
       if (url.includes('/movimientos')) {
         if (entorno.resolverHistorial) return entorno.resolverHistorial(url);
@@ -74,6 +77,7 @@ test('respuesta antigua no sobrescribe una búsqueda más reciente', async () =>
   const p = pantalla(); await esperar(); let resolver;
   p.entorno.resolverHistorial = () => new Promise(resolve => { resolver = resolve; });
   p.byId('filtros').listeners.submit({ preventDefault() { }, currentTarget: p.byId('filtros') });
+  await esperar();
   p.entorno.resolverHistorial = null; p.byId('filtros').listeners.reset(); await esperar();
   resolver({ ok: true, json: async () => [{ registradoEn: '2026-10-06T12:00:00Z', tipo: 'ENTRADA', origen: 'MANUAL', placa: 'VIEJA' }] }); await esperar();
   assert.match(p.byId('resultado-historial').textContent, /No hay movimientos/);
@@ -89,4 +93,29 @@ test('confirma el tipo y la placa del movimiento registrado', async () => {
   const p = pantalla(); await esperar(); p.byId('placa').value = 'abc-123';
   p.botones[0].listeners.click(); await esperar();
   assert.equal(p.byId('aviso').textContent, 'Entrada confirmada · Placa ABC-123.');
+});
+
+test('comparte el JWT inicial y lo envía en cada petición API', async () => {
+  const p = pantalla(); await esperar();
+  assert.equal(p.entorno.tokens, 1);
+  for (const peticion of p.entorno.peticiones.filter(p => p.url.startsWith('/api/'))) assert.equal(peticion.headers.Authorization, 'Bearer jwt-1');
+});
+test('renueva JWT vencido sin cambiar el UUID del movimiento', async () => {
+  const p = pantalla(); await esperar(); p.entorno.expirar = true;
+  p.botones[0].listeners.click(); await esperar();
+  const envios = p.entorno.peticiones.filter(p => p.method === 'POST');
+  assert.equal(envios.length, 2); assert.equal(envios[0].body, envios[1].body);
+  assert.equal(envios[1].headers.Authorization, 'Bearer jwt-2');
+  assert.equal(p.entorno.tokens, 2);
+});
+test('consulta no registra y mantiene actualización de aforo', async () => {
+  const p = pantalla(undefined, false); await esperar();
+  p.botones[0].listeners.click(); await esperar();
+  assert.equal(p.entorno.peticiones.filter(p => p.method === 'POST').length, 0);
+  assert.equal(p.byId('porcentaje').textContent, '80 %');
+});
+test('sesión vencida avisa y no envía solicitudes API sin token', async () => {
+  const p = pantalla(undefined, true, false); await esperar();
+  assert.equal(p.byId('sesion-vencida').hidden, false);
+  assert.equal(p.entorno.peticiones.filter(p => p.url.startsWith('/api/')).length, 0);
 });
