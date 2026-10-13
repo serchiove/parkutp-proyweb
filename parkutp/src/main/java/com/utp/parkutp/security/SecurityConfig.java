@@ -47,7 +47,18 @@ public class SecurityConfig {
                         .requestMatchers(antMatcher(HttpMethod.OPTIONS, "/api/**")).permitAll()
                         .requestMatchers(antMatcher(HttpMethod.POST, "/api/auth/login")).permitAll()
                         .requestMatchers(antMatcher(HttpMethod.GET, "/api/auth/yo")).authenticated()
-                        .anyRequest().permitAll());
+                                                // Registrar entrada o salida: ADMIN y OPERADOR.
+                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/estacionamientos/*/movimientos"))
+                                .hasAnyRole(Rol.ADMIN.name(), Rol.OPERADOR.name())
+                        // Consultas (sedes, zonas, accesos, aforo e historial): los tres roles //
+                        .requestMatchers(antMatcher(HttpMethod.GET, "/api/**"))
+                                .hasAnyRole(Rol.ADMIN.name(), Rol.OPERADOR.name(), Rol.CONSULTA.name())
+                        // Crear, editar o eliminar sedes, zonas y accesos: solo ADMIN //
+                        .requestMatchers(antMatcher(HttpMethod.POST, "/api/**")).hasRole(Rol.ADMIN.name())
+                        .requestMatchers(antMatcher(HttpMethod.PUT, "/api/**")).hasRole(Rol.ADMIN.name())
+                        .requestMatchers(antMatcher(HttpMethod.DELETE, "/api/**")).hasRole(Rol.ADMIN.name())
+                        // Todo lo no previsto se niega //
+                        .anyRequest().denyAll());
         return http.build();
     }
 
