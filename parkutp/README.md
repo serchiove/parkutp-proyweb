@@ -771,7 +771,7 @@ git switch -c nombre-descriptivo-de-la-tarea
 Editar y verificar antes de preparar los archivos. Ejemplo para esta documentación, utilizando el nombre de rama elegido:
 
 ```powershell
-git add README.md parkutp/README.md
+git add parkutp/README.md
 git --no-pager diff --cached --stat
 git commit -m "Documenta instalación, uso y verificación completa del APF2"
 git push -u origin nombre-descriptivo-de-la-tarea
