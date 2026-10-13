@@ -404,10 +404,10 @@ Organizamos nuestro backend por responsabilidades e inyectamos las dependencias 
 
 ```text
 parkutp-avance2/                       Raíz Git
+├── README.md                         Documentación principal
 └── parkutp/                           Proyecto Maven
     ├── pom.xml
     ├── mvnw / mvnw.cmd / .mvn/        Maven Wrapper
-    ├── README.md                     Documentación principal
     ├── scripts/                      Inicio, parada local y pruebas
     ├── postman/                      Colecciones API
     ├── docs/                         Decisiones y verificación
@@ -650,7 +650,7 @@ No necesita `npm install`. Cubre aforo, filtros, respuestas fuera de orden, desc
 Verificamos CRUD, validaciones, JPQL, idempotencia, placas, concurrencia, rollback, roles, tokens inválidos/vencidos, cuentas desactivadas, cambios de rol, CSRF, login y logout.
 
 > [!NOTE]
-> Estos resultados corresponden a la verificación documentada del cierre del APF2. Las condiciones de ejecución están en [Verificación APF2](docs/Verificacion-APF2.md); al repetir la suite, se deben conservar los nuevos resultados como evidencia.
+> Estos resultados corresponden a la verificación documentada del cierre del APF2. Las condiciones de ejecución están en [Verificación APF2](parkutp/docs/Verificacion-APF2.md); al repetir la suite, se deben conservar los nuevos resultados como evidencia.
 
 ## 12. Postman
 
@@ -770,7 +770,7 @@ git switch -c nombre-descriptivo-de-la-tarea
 Editar y verificar antes de preparar los archivos. Ejemplo para esta documentación, utilizando el nombre de rama elegido:
 
 ```powershell
-git add parkutp/README.md
+git add README.md
 git --no-pager diff --cached --stat
 git commit -m "Documenta instalación, uso y verificación completa del APF2"
 git push -u origin nombre-descriptivo-de-la-tarea
@@ -797,16 +797,16 @@ Relacionamos los requisitos del checklist con lo que implementamos para este ava
 
 Documentación adicional:
 
-- [Inicio original](EMPIEZA-AQUI.md): ante diferencias, seguir esta guía actualizada.
-- [Modelo y arquitectura](docs/Modelo-y-arquitectura.md).
-- [Historial y JPQL](docs/JPQL-historial.md).
-- [Persistencia JPA — Melissa](docs/Persistencia-JPA-Melissa.md).
-- [Registro de movimientos](docs/Registro-movimientos-JPA.md).
-- [Operación y aforo](docs/Operacion-y-aforo.md).
-- [Control por placa](docs/Control-por-placa.md).
-- [Seguridad APF2](docs/Seguridad-APF2.md).
-- [Verificación APF2](docs/Verificacion-APF2.md).
-- [Guion previo](docs/Guion-demo.md): complementar con login y roles actuales.
+- [Inicio original](parkutp/EMPIEZA-AQUI.md): ante diferencias, seguir esta guía actualizada.
+- [Modelo y arquitectura](parkutp/docs/Modelo-y-arquitectura.md).
+- [Historial y JPQL](parkutp/docs/JPQL-historial.md).
+- [Persistencia JPA — Melissa](parkutp/docs/Persistencia-JPA-Melissa.md).
+- [Registro de movimientos](parkutp/docs/Registro-movimientos-JPA.md).
+- [Operación y aforo](parkutp/docs/Operacion-y-aforo.md).
+- [Control por placa](parkutp/docs/Control-por-placa.md).
+- [Seguridad APF2](parkutp/docs/Seguridad-APF2.md).
+- [Verificación APF2](parkutp/docs/Verificacion-APF2.md).
+- [Guion previo](parkutp/docs/Guion-demo.md): complementar con login y roles actuales.
 
 ## 18. Límites y evolución
 
