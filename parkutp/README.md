@@ -404,7 +404,6 @@ Organizamos nuestro backend por responsabilidades e inyectamos las dependencias 
 
 ```text
 parkutp-avance2/                       Raíz Git
-├── README.md                         Acceso a esta guía
 └── parkutp/                           Proyecto Maven
     ├── pom.xml
     ├── mvnw / mvnw.cmd / .mvn/        Maven Wrapper
