@@ -61,4 +61,4 @@ Ctrl+C en la terminal detiene la aplicación. Después, para detener la base loc
 .\scripts\Detener-PostgresLocal.ps1
 ```
 
-Los datos se conservan para la próxima ejecución. En `README.md` están la configuración con una base existente, la API, las pruebas y los límites del prototipo.
+Los datos se conservan para la próxima ejecución. En la [guía principal del repositorio](../README.md) están la configuración con una base existente, la API, las pruebas y los límites del prototipo.
