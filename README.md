@@ -31,6 +31,7 @@ Construimos la interfaz actual con JSP, JSF y Bootstrap. Trabajamos sobre el esc
 | Quiero… | Ir a… |
 |:---|:---|
 | Instalar y ejecutar el proyecto | [Instalación paso a paso](#3-instalación-paso-a-paso) |
+| Ejecutar con Docker y PostgreSQL incluidos | [Guía de Docker](parkutp/docs/Docker.md) |
 | Conocer las pantallas y los roles | [Usuarios](#6-usuarios-y-seguridad) · [Guía de uso](#7-guía-de-uso) |
 | Revisar arquitectura y API | [Arquitectura y datos](#8-arquitectura-y-datos) · [API REST](#9-api-rest) |
 | Ejecutar pruebas y preparar la exposición | [Pruebas](#11-pruebas-automatizadas) · [Postman](#12-postman) · [Demostración](#14-demostración-del-apf2) |

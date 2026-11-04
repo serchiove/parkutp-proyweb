@@ -1,0 +1,14 @@
+.git
+.env
+.env.*
+output
+tmp
+**/target
+**/.maven-cache
+**/.tomcat
+**/.local-data
+**/*.log
+**/.env
+**/.env.*
+**/.idea
+**/.vscode

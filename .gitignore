@@ -1,0 +1,4 @@
+# Configuración local de Docker; contiene contraseñas.
+/.env
+/.env.*
+!/.env.example
