@@ -97,7 +97,7 @@ async function session(rol = 'ADMIN') {
   await page.getByLabel('Usuario', { exact: true }).fill('usuario-prueba');
   await page.getByLabel('Contraseña', { exact: true }).fill('clave-prueba');
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
-  await page.getByRole('heading', { name: 'Operación', exact: true }).waitFor();
+  await page.getByRole('heading', { name: rol === 'CONSULTA' ? 'Aforo' : 'Operación', exact: true }).waitFor();
   await page.locator('#parking').selectOption('1');
   return { context, page, state, errors };
 }
@@ -107,7 +107,7 @@ try {
   check('Login original e interceptor: todas las solicitudes protegidas usan el JWT existente.');
   const menuPrincipal = page.getByRole('navigation', { name: 'Navegación principal' });
   for (const nombre of ['Accesos', 'Historial', 'Operación']) {
-    await menuPrincipal.getByRole('link', { name: new RegExp(nombre + '$') }).click();
+    await menuPrincipal.getByRole('link', { name: new RegExp(nombre + '$', 'i') }).click();
     await page.getByRole('heading', { name: nombre, exact: true }).waitFor();
   }
   check('Menú principal: Accesos, Historial y Operación abren las pantallas integradas.');
@@ -161,7 +161,7 @@ try {
   assert.equal(state.parques[0].ocupados, 1);
   assert.equal(state.posts[0].origen, 'MANUAL');
   assert.match(state.posts[0].eventoId, /^[0-9a-f-]{36}$/);
-  await page.getByText('Ocupación: 20 %', { exact: true }).waitFor();
+  await page.waitForFunction(expected => document.querySelector('#aforo')?.value === expected, 20);
   check('Operación: entrada normaliza placa, crea UUID y actualiza aforo.');
   await page.locator('#placa').fill('ABC-123');
   await page.getByRole('button', { name: 'Registrar movimiento' }).click();
@@ -171,7 +171,7 @@ try {
   await page.locator('#mov-tipo').selectOption('SALIDA');
   await page.getByRole('button', { name: 'Registrar movimiento' }).click();
   await page.getByText('Salida registrada: ABC-123. Movimiento #2.').waitFor();
-  await page.getByText('Ocupación: 0 %', { exact: true }).waitFor();
+  await page.waitForFunction(expected => document.querySelector('#aforo')?.value === expected, 0);
   check('Operación: salida reduce ocupados y libera espacio.');
   state.loseResponse = true;
   await page.locator('#mov-tipo').selectOption('ENTRADA');
@@ -199,12 +199,12 @@ try {
   check('Operación: fallo al refrescar el aforo conserva éxito y no propone duplicar el envío.');
   state.failAforo = false;
   await page.getByRole('button', { name: 'Actualizar aforo', exact: true }).click();
-  await page.getByText('Ocupación: 40 %', { exact: true }).waitFor();
+  await page.waitForFunction(expected => document.querySelector('#aforo')?.value === expected, 40);
   await page.evaluate(() => scrollTo(0, 0));
   await page.screenshot({ path: fileURL('02-operacion.png'), fullPage: true });
   state.parques[0].ocupados = 5;
   await page.getByRole('button', { name: 'Actualizar aforo', exact: true }).click();
-  await page.getByText('Ocupación: 100 %', { exact: true }).waitFor();
+  await page.waitForFunction(expected => document.querySelector('#aforo')?.value === expected, 100);
   await page.locator('#placa').fill('FULL-1');
   await page.getByRole('button', { name: 'Registrar movimiento' }).click();
   await page.getByRole('alert').filter({ hasText: 'inactivo o lleno' }).waitFor();
@@ -218,12 +218,12 @@ try {
   check('Operación: estacionamiento inactivo y error de acceso no configurado visibles.');
   await page.locator('#parking').selectOption('1');
   await nav.getByRole('link', { name: 'Historial', exact: true }).click();
-  await page.getByRole('heading', { name: 'Movimientos (4)', exact: true }).waitFor();
+  await page.locator('.count-badge').filter({ hasText: /^4$/ }).waitFor();
   await page.locator('#fecha').fill('2026-11-17');
   await page.locator('#filtro-placa').fill('xyz');
   await page.locator('#filtro-tipo').selectOption('ENTRADA');
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();
-  await page.getByRole('heading', { name: 'Movimientos (1)', exact: true }).waitFor();
+  await page.locator('.count-badge').filter({ hasText: /^1$/ }).waitFor();
   const search = new URLSearchParams(state.requests.at(-1).search);
   assert.equal(search.get('fecha'), '2026-11-17');
   assert.equal(search.get('placa'), 'XYZ');
@@ -232,7 +232,7 @@ try {
   await page.getByRole('cell', { name: /7:10:00/ }).waitFor();
   check('Historial: combina los tres parámetros y presenta la hora de Perú.');
   await page.getByRole('button', { name: 'Actualizar resultados' }).click();
-  await page.getByRole('heading', { name: 'Movimientos (1)', exact: true }).waitFor();
+  await page.locator('.count-badge').filter({ hasText: /^1$/ }).waitFor();
   assert.equal(new URLSearchParams(state.requests.at(-1).search).get('placa'), 'XYZ');
   check('Historial: actualizar conserva filtros aplicados.');
   await page.evaluate(() => scrollTo(0, 0));
@@ -241,7 +241,7 @@ try {
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();
   await page.getByText('No hay movimientos para los filtros seleccionados.').waitFor();
   await page.getByRole('button', { name: 'Limpiar filtros' }).click();
-  await page.getByRole('heading', { name: 'Movimientos (4)', exact: true }).waitFor();
+  await page.locator('.count-badge').filter({ hasText: /^4$/ }).waitFor();
   check('Historial: estado vacío y limpieza de filtros.');
   state.delayHistory = true;
   await page.getByRole('button', { name: 'Actualizar resultados' }).click();
@@ -261,7 +261,7 @@ try {
   state.failList = false;
   await page.getByRole('button', { name: 'Actualizar estacionamientos' }).click();
   await page.locator('#parking').selectOption('1');
-  await page.getByRole('heading', { name: 'Movimientos (4)', exact: true }).waitFor();
+  await page.locator('.count-badge').filter({ hasText: /^4$/ }).waitFor();
   check('Conexión: error visible y recuperación al actualizar estacionamientos.');
   state.expire = true;
   await page.getByRole('button', { name: 'Actualizar resultados' }).click();
@@ -275,7 +275,7 @@ try {
     await s.page.getByRole('navigation', { name: 'Gestión de estacionamientos' }).getByRole('link', { name: 'Accesos', exact: true }).click();
     await s.page.getByText('Puedes consultar los accesos.').waitFor();
     assert.equal(await s.page.getByRole('button', { name: 'Crear acceso', exact: true }).count(), 0);
-    await s.page.getByRole('navigation', { name: 'Gestión de estacionamientos' }).getByRole('link', { name: 'Operación', exact: true }).click();
+    await s.page.getByRole('navigation', { name: 'Gestión de estacionamientos' }).getByRole('link', { name: rol === 'CONSULTA' ? 'Aforo' : 'Operación', exact: true }).click();
     if (rol === 'OPERADOR') {
       await s.page.getByRole('button', { name: 'Registrar movimiento' }).waitFor();
       await s.page.getByRole('button', { name: 'Registrar movimiento' }).click();

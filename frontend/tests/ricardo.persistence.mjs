@@ -30,7 +30,7 @@ try {
   await page.locator('#username').fill('admin');
   await page.locator('#password').fill(password);
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
-  await page.getByRole('heading', { name: 'Movimientos (4)', exact: true }).waitFor();
+  await page.locator('.count-badge').filter({ hasText: /^4$/ }).waitFor();
   await page.evaluate(() => scrollTo(0, 0));
   await page.screenshot({ path: fileURLToPath(new URL('07-despues-reinicio.png', output)), fullPage: true });
   report.persistencia = { fecha: new Date().toISOString(), resultado: 'Después de reiniciar el backend: mismos 4 IDs de movimiento, aforo 0 y consulta Angular correcta.' };

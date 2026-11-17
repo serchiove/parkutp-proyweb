@@ -1,5 +1,5 @@
 {
-  "fecha": "2026-11-17T17:00:35.339Z",
+  "fecha": "2026-11-17T18:47:13.921Z",
   "entorno": "Frontend Angular con API simulada por Playwright; sin PostgreSQL",
   "resultados": [
     "Login original e interceptor: todas las solicitudes protegidas usan el JWT existente.",

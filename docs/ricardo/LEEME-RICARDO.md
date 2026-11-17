@@ -4,9 +4,9 @@ Fecha: 17 de noviembre de 2026.
 
 ## Qué se implementó
 
-Se añadieron tres pantallas Angular conectadas a los endpoints REST que ya trae el backend. Todo el código del módulo está en `frontend/src/app/features/gestion-estacionamientos/`. El aporte conserva autenticación, sedes, estacionamientos, estilos globales, backend y dependencias. La integración posterior conecta las tres pantallas en las rutas principales y agrega Accesos al menú. La rama parte de la actualización de diseño del coordinador (ea613e4) y reutiliza su tipografía mediante las variables existentes.
+Se añadieron tres pantallas Angular conectadas a los endpoints REST que ya trae el backend. Todo el código del módulo está en `frontend/src/app/features/gestion-estacionamientos/`. Las rutas ya están integradas como hijas del `AppShell` protegido; Accesos aparece en el menú y Operación e Historial reemplazan sus pantallas provisionales. Sedes y Estacionamientos conservan sus pantallas actuales. El módulo reutiliza el servicio de autenticación, el interceptor JWT y las variables visuales del proyecto.
 
-Las rutas de accesos, operación e historial ya están incorporadas en el AppShell protegido. Se pueden abrir con el arranque normal `npm start`. La entrada de revisión independiente se conserva como herramienta opcional.
+El arranque normal con `npm start` utiliza las rutas integradas. `preview-ricardo.mjs` se conserva como entrada opcional para revisar el módulo de manera aislada.
 
 ## Cómo abrirlo y probarlo contra la API real
 
@@ -23,16 +23,16 @@ Deja esa terminal abierta y, en otra terminal dentro de `frontend`, ejecuta `npm
 1. Levanta el backend y PostgreSQL siguiendo el README original o `parkutp/docs/Docker.md`. La URL esperada por el frontend existente es `http://localhost:8081/api`. Usa las credenciales que configuró el equipo; esta entrega no cambia ni agrega usuarios o contraseñas.
 2. Abre una terminal en `frontend`.
 3. Instala las dependencias originales con `npm ci` si aún no están instaladas.
-4. Ejecuta:
+4. Ejecuta la aplicación integrada:
 
 ```powershell
 npm start
 ```
 
 5. Abre `http://localhost:4200/operacion`. Si no tienes sesión, se muestra el login original. Usa `localhost`, porque es el origen autorizado por defecto en el backend.
-6. Navega entre Accesos, Operación e Historial mediante las pestañas dentro de la pantalla. La barra lateral del coordinador se conserva.
+6. Navega entre Accesos, Operación e Historial desde el menú lateral o las pestañas de las pantallas.
 
-El puerto 4200 debe estar libre; detén primero cualquier `ng serve` que use ese puerto. El servidor de desarrollo de Angular recarga los cambios automáticamente mientras está abierto.
+El puerto 4200 debe estar libre; detén primero cualquier `ng serve` que use ese puerto. `npm start` recarga los cambios automáticamente. La entrada `node preview-ricardo.mjs` compila una vez y queda disponible para una revisión aislada si se necesita.
 
 ## Explicación de cada implementación
 
@@ -129,8 +129,6 @@ Al registrar `abc-123` como ingreso:
 
 ## Validación realizada y límites
 
-La integración posterior aprobó 25 comprobaciones de navegador con API simulada usando la compilación normal de producción, incluida la navegación desde las tres opciones del menú principal. El reporte y una captura del menú integrado están en `evidencias/integracion-rutas/`. Las compilaciones normales de desarrollo y producción también pasaron.
-
 - Compilación Angular de desarrollo de las tres pantallas: aprobada.
 - Compilación de producción: aprobada, con advertencias de tamaño en los estilos originales de login y app-shell.
 - 24 comprobaciones de navegador con Microsoft Edge y API simulada: aprobadas. Incluyen CRUD de accesos, errores 409, validación de placa, ingresos y salidas, UUID y reintentos tras navegar, aforo, filtros, respuestas tardías, permisos, conexión, sesión vencida y ancho móvil.
@@ -138,7 +136,7 @@ La integración posterior aprobó 25 comprobaciones de navegador con API simulad
 - Recorrido real completado con Angular, Spring Boot y PostgreSQL 18.7: 14 comprobaciones aprobadas. Se comprobaron CRUD de accesos, errores reales, ingreso/salida con placa y sin placa, aforo, filtros y permisos. Capturas y resultados en `evidencias/api-real/`.
 - Persistencia comprobada tras reiniciar backend y base local: se conservaron los mismos cuatro movimientos y aforo cero; el historial de Angular los mostró correctamente.
 - La compilación inicial del backend ejecutó 15 pruebas aprobadas y omitió 57 pruebas que requieren la base dedicada `TEST_DB_URL`. El recorrido real anterior se ejecutó por separado en la base de demostración; no equivale a ejecutar esas 57 pruebas.
-- El aporte se prepara en la rama `ricardo/accesos-operacion-historial` del repositorio del equipo, sobre `origin/main`. El PR #27 incorporó el módulo. La rama ricardo/integracion-rutas-menu propone conectar sus rutas y agregar Accesos al menú para revisión de Sergio.
+- El aporte se prepara en la rama `ricardo/accesos-operacion-historial` del repositorio del equipo, sobre `origin/main`. El PR solicita coordinar la incorporación de rutas y la ubicación de Accesos en el menú antes de integrar.
 
 ## Repetir las pruebas automatizadas
 
@@ -166,6 +164,6 @@ El script abre su propio servidor en un puerto libre y lo cierra al terminar; no
 5. Historial: filtros y protección frente a respuestas tardías.
 6. Componentes compartidos y guía de integración.
 
-Consulta `INTEGRACION-Y-PR.md` para incorporar los archivos al repositorio actualizado y proponer la integración al coordinador.
+Consulta `INTEGRACION-Y-PR.md` para ver cómo quedaron conectadas las rutas y el menú en la integración actual.
 
 Las pruebas reales se pueden repetir con `node tests/ricardo.real.e2e.mjs` una vez iniciado el backend y con el puerto 4200 libre. Crea datos nuevos y deja evidencia. Después de reiniciar el backend, `node tests/ricardo.persistence.mjs` compara los mismos IDs y guarda una captura. Ambos scripts requieren Playwright y Edge, y leen las credenciales locales sin incorporarlas al reporte.

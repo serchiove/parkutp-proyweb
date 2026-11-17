@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { AuthService } from './core/auth/auth.service';
 import { authGuard } from './core/auth/auth.guard';
 import { AppShell } from './layout/app-shell/app-shell';
 import { LoginPage } from './pages/login/login-page';
@@ -12,7 +14,7 @@ export const routes: Routes = [
     component: AppShell,
     canActivate: [authGuard],
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'estacionamientos' },
+      { path: '', pathMatch: 'full', redirectTo: () => inject(AuthService).homePath() },
       { path: 'estacionamientos', component: ModulePlaceholderPage, data: { title: 'Estacionamientos', description: 'Consulta y administra los estacionamientos registrados en ParkUTP.', icon: 'P' } },
       { path: 'sedes', component: ModulePlaceholderPage, data: { title: 'Sedes', description: 'Organiza las sedes universitarias y sus espacios disponibles.', icon: 'S' } },
       ...gestionEstacionamientoRoutes,

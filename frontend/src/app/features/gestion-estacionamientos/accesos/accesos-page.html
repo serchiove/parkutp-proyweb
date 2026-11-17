@@ -1,14 +1,21 @@
-<h1>Accesos</h1>
-<p class="intro">Administra los puntos de entrada y salida de cada estacionamiento.</p>
+<header class="page-heading">
+  <div>
+    <span class="eyebrow">PANEL DE GESTIÓN <span>›</span> ACCESOS</span>
+    <h1>Accesos</h1>
+    <p class="intro">Administra los puntos de entrada y salida de cada estacionamiento.</p>
+  </div>
+  <span class="heading-icon" aria-hidden="true">⇄</span>
+</header>
 <app-parking-selector [disabled]="guardando()" (changed)="cambiarEstacionamiento()" />
 @if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
 @if (exito()) { <p class="notice success" role="status">{{ exito() }}</p> }
 @if (ctx.seleccionado()) {
   @if (ctx.esAdmin()) {
     <section class="card">
+      <span class="section-kicker">CONFIGURACIÓN DE INGRESOS</span>
       <h2>{{ editando() ? 'Editar acceso' : 'Nuevo acceso' }}</h2>
       <form [formGroup]="form" (ngSubmit)="guardar()">
-        <fieldset [disabled]="guardando() || cargando()" style="border: 0; padding: 0; margin: 0">
+        <fieldset class="form-fieldset" [disabled]="guardando() || cargando()">
           <div class="fields">
             <label for="nombre">Nombre
               <input id="nombre" formControlName="nombre" maxlength="80" autocomplete="off" [attr.aria-invalid]="form.controls.nombre.touched && form.controls.nombre.invalid" aria-describedby="nombre-error">
@@ -23,7 +30,7 @@
           <p><small>Solo puede existir un acceso de cada tipo. Al editar se conserva el tipo original.</small></p>
           <div class="actions">
             <button class="btn-primary" type="submit">{{ guardando() ? 'Guardando…' : editando() ? 'Guardar cambios' : 'Crear acceso' }}</button>
-            @if (editando()) { <button type="button" (click)="cancelar()">Cancelar edición</button> }
+            @if (editando()) { <button class="button-secondary" type="button" (click)="cancelar()">Cancelar edición</button> }
           </div>
         </fieldset>
       </form>
@@ -40,14 +47,14 @@
     </section>
   }
   <section class="card" [attr.aria-busy]="cargando()">
-    <h2>Accesos registrados</h2>
+    <div class="section-heading"><div><span class="section-kicker">ESTACIONAMIENTO SELECCIONADO</span><h2>Accesos registrados</h2></div><span class="count-badge">{{ accesos().length }}</span></div>
     @if (cargando()) { <p role="status">Cargando accesos…</p> }
     @else if (!error() && !accesos().length) { <p>No hay accesos registrados en este estacionamiento.</p> }
     @if (accesos().length) {
       <div class="table-wrap"><table>
         <thead><tr><th scope="col">ID</th><th scope="col">Nombre</th><th scope="col">Tipo</th>@if (ctx.esAdmin()) { <th scope="col">Acciones</th> }</tr></thead>
         <tbody>@for (acceso of accesos(); track acceso.id) {
-          <tr><td>{{ acceso.id }}</td><td class="name">{{ acceso.nombre }}</td><td>{{ acceso.tipo }}</td>
+          <tr><td>{{ acceso.id }}</td><td class="name">{{ acceso.nombre }}</td><td><span class="movement-badge" [class.exit]="acceso.tipo === 'SALIDA'">{{ acceso.tipo === 'ENTRADA' ? 'Entrada' : 'Salida' }}</span></td>
             @if (ctx.esAdmin()) {
               <td><button type="button" [disabled]="guardando()" (click)="editar(acceso)">Editar</button>
               <button class="danger" type="button" [disabled]="guardando()" (click)="porEliminar.set(acceso)">Eliminar</button></td>
@@ -58,3 +65,4 @@
     }
   </section>
 }
+

@@ -11,6 +11,7 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly sessionState = signal<AuthSession | null>(null);
   readonly session = this.sessionState.asReadonly();
+  readonly homePath = computed(() => this.sessionState()?.rol === 'CONSULTA' ? '/historial' : '/operacion');
   readonly isAuthenticated = computed(() => this.sessionState() !== null);
 
   login(credentials: LoginRequest) {

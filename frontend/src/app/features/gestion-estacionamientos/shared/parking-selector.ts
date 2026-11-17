@@ -8,7 +8,7 @@ import { ParkingContext } from './parking-context';
   template: `
     <nav class="module-nav" aria-label="Gestión de estacionamientos">
       <a routerLink="/accesos" routerLinkActive="selected" [queryParams]="{ estacionamiento: ctx.seleccionado()?.id }">Accesos</a>
-      <a routerLink="/operacion" routerLinkActive="selected" [queryParams]="{ estacionamiento: ctx.seleccionado()?.id }">Operación</a>
+      <a routerLink="/operacion" routerLinkActive="selected" [queryParams]="{ estacionamiento: ctx.seleccionado()?.id }">{{ ctx.puedeOperar() ? 'Operación' : 'Aforo' }}</a>
       <a routerLink="/historial" routerLinkActive="selected" [queryParams]="{ estacionamiento: ctx.seleccionado()?.id }">Historial</a>
     </nav>
     <section class="card selector" aria-label="Seleccionar estacionamiento">
@@ -47,3 +47,4 @@ export class ParkingSelector implements OnInit {
     this.changed.emit();
   }
 }
+

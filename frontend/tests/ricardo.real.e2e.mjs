@@ -78,7 +78,7 @@ try {
   await page.locator('#placa').fill('ric-123');
   await page.getByRole('button', { name: 'Registrar movimiento' }).click();
   await page.getByText(/Ingreso registrado: RIC-123\. Movimiento #/).waitFor();
-  await page.getByText('Ocupación: 20 %', { exact: true }).waitFor();
+  await page.waitForFunction(expected => document.querySelector('#aforo')?.value === expected, 20);
   await capture(page, '02-ingreso-aforo.png');
   check('Ingreso real por Angular: normalización de placa y aforo 1/5.');
   await page.locator('#placa').fill('RIC-123');
@@ -88,7 +88,7 @@ try {
   await page.locator('#mov-tipo').selectOption('SALIDA');
   await page.getByRole('button', { name: 'Registrar movimiento' }).click();
   await page.getByText(/Salida registrada: RIC-123\. Movimiento #/).waitFor();
-  await page.getByText('Ocupación: 0 %', { exact: true }).waitFor();
+  await page.waitForFunction(expected => document.querySelector('#aforo')?.value === expected, 0);
   await capture(page, '03-salida-aforo.png');
   check('Salida real por Angular: aforo vuelve a 0/5.');
   await page.locator('#placa').fill('RIC-123');
@@ -96,13 +96,13 @@ try {
   await page.getByRole('alert').filter({ hasText: 'no tiene una entrada pendiente' }).waitFor();
   check('Backend rechaza salida sin entrada pendiente.');
   await nav.getByRole('link', { name: 'Historial', exact: true }).click();
-  await page.getByRole('heading', { name: 'Movimientos (2)', exact: true }).waitFor();
+  await page.locator('.count-badge').filter({ hasText: /^2$/ }).waitFor();
   const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'America/Lima' }).format(new Date());
   await page.locator('#fecha').fill(today);
   await page.locator('#filtro-placa').fill('ric');
   await page.locator('#filtro-tipo').selectOption('ENTRADA');
   await page.getByRole('button', { name: 'Buscar', exact: true }).click();
-  await page.getByRole('heading', { name: 'Movimientos (1)', exact: true }).waitFor();
+  await page.locator('.count-badge').filter({ hasText: /^1$/ }).waitFor();
   await page.getByRole('cell', { name: 'RIC-123', exact: true }).waitFor();
   await capture(page, '04-historial-filtrado.png');
   check('Filtros reales combinados por fecha local, placa parcial y tipo.');
