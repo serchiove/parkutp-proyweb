@@ -7,6 +7,7 @@ export class AppShell {
   readonly navigation = [
     { label: 'Estacionamientos', path: '/estacionamientos', icon: '▦' },
     { label: 'Sedes', path: '/sedes', icon: '⌖' },
+    { label: 'Accesos', path: '/accesos', icon: '⇄' },
     { label: 'Operación', path: '/operacion', icon: '↔' },
     { label: 'Historial', path: '/historial', icon: '◷' },
   ];
