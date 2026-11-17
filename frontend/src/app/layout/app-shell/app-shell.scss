@@ -13,15 +13,13 @@
 
 .brand { display: flex; gap: 12px; align-items: center; padding: 6px 10px 32px; text-decoration: none; color: #fff; }
 .brand-mark {
-  display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px;
-  background: var(--utp-red); color: #fff; font: 800 24px 'Manrope', sans-serif;
-  box-shadow: 0 8px 18px rgb(228 0 43 / 35%);
+  display: block; width: 46px; height: 46px; flex: 0 0 46px;
 }
-.brand-name { font: 800 23px 'Manrope', sans-serif; letter-spacing: -.8px; }
+.brand-name { display: block; font: 400 14px/1.35 var(--font-brand); letter-spacing: .04em; }
 .brand-name > span { color: var(--utp-red-light); }
-.brand-name small { display: block; margin-top: 3px; color: #9a9da4; font: 600 9px 'DM Sans', sans-serif; letter-spacing: 1.1px; }
+.brand-name small { display: block; margin-top: 4px; color: #9a9da4; font: 700 7px/1.3 var(--font-base); letter-spacing: .1em; }
 
-.nav-caption { margin: 4px 12px 12px; color: #7d8087; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+.nav-caption { margin: 4px 12px 12px; color: #a9adb3; font: 400 9px/1.5 var(--font-brand); letter-spacing: .035em; }
 nav { display: grid; gap: 6px; }
 .nav-link {
   position: relative; display: flex; align-items: center; gap: 13px; min-height: 48px; padding: 0 14px;
@@ -40,7 +38,7 @@ nav { display: grid; gap: 6px; }
 .help-card strong, .help-card small { display: block; }
 .help-card strong { font-size: 12px; }
 .help-card small { margin-top: 4px; color: #9a9da4; font-size: 11px; }
-.sidebar-footer { padding: 18px 5px 0; color: #6d7077; font-size: 9px; font-weight: 600; letter-spacing: .6px; text-align: center; }
+.sidebar-footer { padding: 18px 5px 0; color: #92959c; font: 400 8px/1.6 var(--font-brand); letter-spacing: .025em; text-align: center; }
 
 /* ================= ÁREA DE TRABAJO ================= */
 .workspace { min-width: 0; flex: 1; display: flex; flex-direction: column; }
@@ -72,6 +70,14 @@ nav { display: grid; gap: 6px; }
 .page-content { width: min(1200px, 100%); flex: 1; margin: 0 auto; padding: 40px 42px; }
 .workspace-footer { padding: 16px 42px; border-top: 1px solid var(--line); background: #fff; color: #9a9da4; font-size: 11px; }
 .workspace-footer span { padding: 0 5px; color: #c7cace; }
+.workspace-footer .footer-brand { color: var(--utp-ink); font: 400 9px var(--font-brand); letter-spacing: .03em; }
+
+.topbar { min-height: 68px; }
+.breadcrumb { font-size: 12px; }
+.nav-link { min-height: 46px; font-size: 13px; }
+.page-content { width: min(1240px, 100%); padding: 36px clamp(24px, 3.2vw, 48px); }
+.workspace-footer { background: var(--surface); }
+.help-card { border-radius: 9px; }
 
 @media (max-width: 760px) {
   .sidebar { width: 72px; flex-basis: 72px; padding: 22px 10px; }
@@ -85,4 +91,14 @@ nav { display: grid; gap: 6px; }
   .page-content { padding: 28px 18px; }
   .workspace-footer { padding-inline: 18px; }
   .account-name { max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
+}
+
+@media (max-width: 480px) {
+  .sidebar { width: 60px; flex-basis: 60px; padding-inline: 6px; }
+  .brand-mark { width: 42px; height: 42px; flex-basis: 42px; }
+  .topbar { height: 62px; flex-basis: 62px; }
+  .breadcrumb { gap: 6px; font-size: 10px; }
+  .account { gap: 6px; }
+  .account-name { max-width: 72px; font-size: 11px; }
+  .page-content { padding: 24px 14px; }
 }

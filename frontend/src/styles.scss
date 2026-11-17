@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Michroma&display=swap');
 
 :root {
   color-scheme: light;
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-base);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -16,6 +16,8 @@
   --utp-bg: #f4f5f7;
   --line: #e6e8eb;
   --surface: #ffffff;
+  --font-base: 'Archivo', system-ui, sans-serif;
+  --font-brand: 'Michroma', 'Archivo', system-ui, sans-serif;
   --ink: var(--utp-ink);
   --muted: var(--utp-gray);
   --green: var(--utp-red);
@@ -28,6 +30,7 @@
 }
 
 * { box-sizing: border-box; }
+html, body { font-family: var(--font-base); }
 body { min-width: 320px; min-height: 100vh; margin: 0; background: var(--utp-bg); }
 button, input, select, textarea { font: inherit; }
 a { color: inherit; }
