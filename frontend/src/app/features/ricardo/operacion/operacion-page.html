@@ -1,0 +1,48 @@
+<h1>Operación</h1>
+<p class="intro">Registra ingresos y salidas y consulta el aforo del estacionamiento.</p>
+<app-parking-selector [disabled]="guardando() || actualizando() || !!pendiente()" [preferido]="pendiente()?.id" (changed)="cambiarEstacionamiento()" />
+@if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+@if (exito()) { <p class="notice success" role="status">{{ exito() }}</p> }
+@if (aviso()) { <p class="notice error" role="alert">{{ aviso() }}</p> }
+@if (ctx.seleccionado(); as e) {
+  <section class="card" aria-label="Aforo actual">
+    <h2>{{ e.nombre }} · {{ e.activo ? 'Activo' : 'Inactivo' }}</h2>
+    <div class="metrics">
+      <div>Capacidad<strong>{{ e.capacidad }}</strong></div>
+      <div>Ocupados<strong>{{ e.ocupados }}</strong></div>
+      <div>Disponibles<strong>{{ ctx.disponibles() }}</strong></div>
+    </div>
+    <label for="aforo">Ocupación: {{ ctx.porcentaje() }} %</label>
+    <progress id="aforo" [value]="ctx.porcentaje()" max="100" [class.warning]="ctx.porcentaje() >= 80" [class.full]="ctx.porcentaje() >= 100" [class.inactive]="!e.activo">{{ ctx.porcentaje() }} %</progress>
+    <p><small>El aforo se actualiza al seleccionar un estacionamiento, registrar un movimiento o pulsar Actualizar aforo.</small></p>
+    <button type="button" [disabled]="guardando() || actualizando()" (click)="actualizar()">{{ actualizando() ? 'Actualizando…' : 'Actualizar aforo' }}</button>
+  </section>
+  @if (ctx.puedeOperar()) {
+    <section class="card">
+      <h2>Registrar movimiento</h2>
+      @if (!e.activo) { <p class="notice">El estacionamiento está inactivo. Se permiten salidas, pero no nuevos ingresos.</p> }
+      @if (!ctx.disponibles()) { <p class="notice">No hay espacios disponibles. Actualiza el aforo si otro operador registró una salida.</p> }
+      <form [formGroup]="form" (ngSubmit)="registrar()">
+        <fieldset [disabled]="guardando() || actualizando() || !!pendiente()" style="border: 0; padding: 0; margin: 0">
+          <div class="fields">
+            <label for="mov-tipo">Movimiento<select id="mov-tipo" formControlName="tipo"><option value="ENTRADA">Ingreso</option><option value="SALIDA">Salida</option></select></label>
+            <label for="placa">Placa (opcional)
+              <input id="placa" formControlName="placa" maxlength="12" autocomplete="off" placeholder="ABC-123" aria-describedby="placa-ayuda" [attr.aria-invalid]="form.controls.placa.touched && form.controls.placa.invalid">
+              <small id="placa-ayuda">De 3 a 12 letras, números o guiones. Déjala vacía para un movimiento sin placa.</small>
+              @if (form.controls.placa.touched && form.controls.placa.invalid) { <span class="field-error">La placa debe tener de 3 a 12 letras, números o guiones.</span> }
+            </label>
+          </div>
+          <button class="btn-primary" type="submit">{{ guardando() ? 'Registrando…' : 'Registrar movimiento' }}</button>
+        </fieldset>
+      </form>
+      <p><small>Se usa el acceso configurado para el tipo de movimiento. Se verifican el aforo, el estado del estacionamiento y las entradas pendientes de la placa.</small></p>
+      @if (pendiente() && !guardando()) {
+        <div class="notice" role="status">
+          <p>No se pudo confirmar el resultado. Reintenta el mismo evento para evitar duplicar el movimiento.</p>
+          <p>Estacionamiento #{{ pendiente()!.id }} · {{ pendiente()!.data.tipo }} · {{ pendiente()!.data.placa || 'Sin placa' }}</p>
+          <button type="button" (click)="enviar()">Reintentar envío pendiente</button>
+        </div>
+      }
+    </section>
+  } @else { <p class="notice">Tu rol permite consultar el aforo. Registrar movimientos requiere ADMIN u OPERADOR.</p> }
+}

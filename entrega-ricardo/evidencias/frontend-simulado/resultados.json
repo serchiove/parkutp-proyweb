@@ -1,0 +1,30 @@
+{
+  "fecha": "2026-11-17T16:33:20.392Z",
+  "entorno": "Frontend Angular con API simulada por Playwright; sin PostgreSQL",
+  "resultados": [
+    "Login original e interceptor: todas las solicitudes protegidas usan el JWT existente.",
+    "Accesos: formulario vacío no envía datos.",
+    "Accesos: creación por API y normalización de espacios.",
+    "Accesos: se muestra el conflicto 409 de tipo duplicado.",
+    "Accesos: edición conserva el tipo original.",
+    "Accesos: confirmación y rechazo de eliminación con historial asociado.",
+    "Accesos: eliminación 204 actualiza el listado.",
+    "Operación: placa inválida no genera un movimiento.",
+    "Operación: entrada normaliza placa, crea UUID y actualiza aforo.",
+    "Operación: conflicto de placa duplicada se muestra sin cambiar el aforo.",
+    "Operación: salida reduce ocupados y libera espacio.",
+    "Operación: respuesta perdida, navegación y reintento conservan el UUID; un solo incremento.",
+    "Operación: fallo al refrescar el aforo conserva éxito y no propone duplicar el envío.",
+    "Operación: estacionamiento lleno presenta 100 % y muestra el rechazo del ingreso.",
+    "Operación: estacionamiento inactivo y error de acceso no configurado visibles.",
+    "Historial: combina los tres parámetros y presenta la hora de Perú.",
+    "Historial: actualizar conserva filtros aplicados.",
+    "Historial: estado vacío y limpieza de filtros.",
+    "Historial: respuesta tardía de otro estacionamiento no contamina la selección actual.",
+    "Diseño móvil: sin desbordamiento horizontal de la página a 390 px.",
+    "Conexión: error visible y recuperación al actualizar estacionamientos.",
+    "Sesión vencida: el interceptor original redirige al login.",
+    "Rol OPERADOR: acciones visibles acordes con sus permisos y registro sin placa.",
+    "Rol CONSULTA: acciones visibles acordes con sus permisos."
+  ]
+}
