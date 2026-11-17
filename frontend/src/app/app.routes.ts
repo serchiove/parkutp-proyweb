@@ -16,7 +16,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: () => inject(AuthService).homePath() },
       { path: 'estacionamientos', component: ModulePlaceholderPage, data: { title: 'Estacionamientos', description: 'Consulta y administra los estacionamientos registrados en ParkUTP.', icon: 'P' } },
-      { path: 'sedes', component: ModulePlaceholderPage, data: { title: 'Sedes', description: 'Organiza las sedes universitarias y sus espacios disponibles.', icon: 'S' } },
+      { path: 'sedes', loadComponent: () => import('./features/administracion/sedes/sedes-page').then(m => m.SedesPage) },
       ...gestionEstacionamientoRoutes,
     ],
   },
