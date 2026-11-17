@@ -3,10 +3,11 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin, map } from 'rxjs';
 import { Estacionamiento } from '../../gestion-estacionamientos/data/parking.models';
 import { AdministracionApiService, Sede } from '../data/administracion-api.service';
+import { AvisoCambios } from '../shared/aviso-cambios';
 import { CrudPage } from '../shared/crud-page';
 
 @Component({
-  selector: 'app-estacionamientos-page', imports: [ReactiveFormsModule],
+  selector: 'app-estacionamientos-page', imports: [ReactiveFormsModule, AvisoCambios],
   templateUrl: './estacionamientos-page.html', styleUrl: '../shared/administracion.scss',
 })
 export class EstacionamientosPage extends CrudPage<Estacionamiento> implements OnInit {

@@ -1,10 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdministracionApiService, Sede } from '../data/administracion-api.service';
+import { AvisoCambios } from '../shared/aviso-cambios';
 import { CrudPage } from '../shared/crud-page';
 
 @Component({
-  selector: 'app-sedes-page', imports: [ReactiveFormsModule],
+  selector: 'app-sedes-page', imports: [ReactiveFormsModule, AvisoCambios],
   templateUrl: './sedes-page.html', styleUrl: '../shared/administracion.scss',
 })
 export class SedesPage extends CrudPage<Sede> implements OnInit {

@@ -1,4 +1,5 @@
-import { computed, Directive, inject, signal } from '@angular/core';
+import { computed, Directive, HostListener, inject, signal } from '@angular/core';
+import { AvisoCambiosService } from './aviso-cambios.service';
 import { FormGroup } from '@angular/forms';
 import { firstValueFrom, Observable } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -8,6 +9,7 @@ import { mensajeError } from '../../gestion-estacionamientos/shared/api-error';
 @Directive()
 export abstract class CrudPage<T extends { id: string | number; nombre: string }> {
   private readonly auth = inject(AuthService);
+  private readonly avisoCambios = inject(AvisoCambiosService);
   readonly esAdmin = computed(() => this.auth.session()?.rol === 'ADMIN');
   readonly registros = signal<T[]>([]);
   readonly cargando = signal(false);
@@ -23,6 +25,18 @@ export abstract class CrudPage<T extends { id: string | number; nombre: string }
   protected abstract reiniciarFormulario(): void;
   protected abstract llenarFormulario(registro: T): void;
 
+  private tieneCambiosSinGuardar(): boolean {
+    return this.esAdmin() && this.auth.isAuthenticated() && this.form.dirty;
+  }
+  puedeSalir(): boolean | Promise<boolean> {
+    return this.tieneCambiosSinGuardar() ? this.avisoCambios.confirmar() : true;
+  }
+  @HostListener('window:beforeunload', ['$event'])
+  avisarAntesDeCerrar(evento: BeforeUnloadEvent): void {
+    if (!this.tieneCambiosSinGuardar()) return;
+    evento.preventDefault();
+    evento.returnValue = '';
+  }
   async cargar(): Promise<void> {
     if (this.cargando()) return;
     this.cargando.set(true); this.error.set(''); this.cargaCorrecta.set(false);
