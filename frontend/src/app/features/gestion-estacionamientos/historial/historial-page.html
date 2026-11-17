@@ -1,0 +1,39 @@
+<h1>Historial</h1>
+<p class="intro">Consulta los movimientos por estacionamiento, fecha, placa y tipo.</p>
+<app-parking-selector (changed)="cambiarEstacionamiento()" />
+@if (ctx.seleccionado()) {
+  <section class="card">
+    <h2>Filtros de búsqueda</h2>
+    <form [formGroup]="form" (ngSubmit)="buscar()">
+      <div class="fields">
+        <label for="fecha">Fecha<input id="fecha" type="date" formControlName="fecha"><small>Día local de Perú.</small></label>
+        <label for="filtro-placa">Placa completa o parcial
+          <input id="filtro-placa" formControlName="placa" maxlength="12" autocomplete="off" placeholder="ABC">
+          @if (form.controls.placa.touched && form.controls.placa.invalid) { <span class="field-error">Usa hasta 12 caracteres.</span> }
+        </label>
+        <label for="filtro-tipo">Tipo<select id="filtro-tipo" formControlName="tipo"><option value="">Todos</option><option value="ENTRADA">Entrada</option><option value="SALIDA">Salida</option></select></label>
+      </div>
+      <div class="actions">
+        <button class="btn-primary" type="submit" [disabled]="cargando()">Buscar</button>
+        <button type="button" (click)="limpiar()">Limpiar filtros</button>
+        <button type="button" [disabled]="cargando()" (click)="cargar()">Actualizar resultados</button>
+      </div>
+    </form>
+    <p><small>Se muestran hasta 50 movimientos, del más reciente al más antiguo. Actualizar conserva los últimos filtros aplicados.</small></p>
+  </section>
+  @if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+  <section class="card" [attr.aria-busy]="cargando()">
+    <h2>Movimientos {{ cargando() ? '' : '(' + movimientos().length + ')' }}</h2>
+    @if (cargando()) { <p role="status">Consultando movimientos…</p> }
+    @else if (!error() && !movimientos().length) { <p role="status">No hay movimientos para los filtros seleccionados.</p> }
+    @if (movimientos().length >= 50) { <p class="notice">Se alcanzó el límite de 50 resultados. Precisa los filtros para consultar otros movimientos.</p> }
+    @if (movimientos().length) {
+      <div class="table-wrap"><table>
+        <thead><tr><th scope="col">ID</th><th scope="col">Fecha y hora (Perú)</th><th scope="col">Placa</th><th scope="col">Tipo</th><th scope="col">Origen</th><th scope="col">Acceso</th></tr></thead>
+        <tbody>@for (m of movimientos(); track m.id) {
+          <tr><td>{{ m.id }}</td><td>{{ fechaLima(m.registradoEn) }}</td><td>{{ m.placa || 'Sin placa' }}</td><td>{{ m.tipo }}</td><td>{{ m.origen }}</td><td>{{ m.accesoId }}</td></tr>
+        }</tbody>
+      </table></div>
+    }
+  </section>
+}

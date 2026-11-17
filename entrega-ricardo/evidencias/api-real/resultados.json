@@ -1,0 +1,53 @@
+{
+  "fecha": "2026-11-17T12:45:23.060Z",
+  "entorno": "Angular + Spring Boot + PostgreSQL 18.7 local; API sin simulación",
+  "sedeId": "RIC-MWKOQJWN",
+  "estacionamientoId": 1,
+  "nombreEstacionamiento": "Zona Ricardo MWKOQJWN",
+  "movimientos": [
+    {
+      "id": 4,
+      "tipo": "SALIDA",
+      "placa": null,
+      "registradoEn": "2026-11-17T12:45:22.147281Z"
+    },
+    {
+      "id": 3,
+      "tipo": "ENTRADA",
+      "placa": null,
+      "registradoEn": "2026-11-17T12:45:22.063057Z"
+    },
+    {
+      "id": 2,
+      "tipo": "SALIDA",
+      "placa": "RIC-123",
+      "registradoEn": "2026-11-17T12:45:20.553141Z"
+    },
+    {
+      "id": 1,
+      "tipo": "ENTRADA",
+      "placa": "RIC-123",
+      "registradoEn": "2026-11-17T12:45:20.139835Z"
+    }
+  ],
+  "resultados": [
+    "Login Angular, CORS e interceptor JWT funcionan con la API real.",
+    "DELETE real de un acceso sin movimientos, con confirmación.",
+    "POST real crea y muestra el acceso de salida.",
+    "PUT real actualiza nombre y conserva tipo.",
+    "Conflicto real 409 por acceso duplicado visible en Angular.",
+    "Ingreso real por Angular: normalización de placa y aforo 1/5.",
+    "Backend rechaza ingreso duplicado y conserva aforo.",
+    "Salida real por Angular: aforo vuelve a 0/5.",
+    "Backend rechaza salida sin entrada pendiente.",
+    "Filtros reales combinados por fecha local, placa parcial y tipo.",
+    "Integridad real: un acceso utilizado no se elimina.",
+    "OPERADOR registra ingreso y salida sin placa con la API real.",
+    "CONSULTA: formulario oculto y backend rechaza POST directo con 403.",
+    "Consulta final real: 4 movimientos guardados y aforo 0."
+  ],
+  "persistencia": {
+    "fecha": "2026-11-17T12:47:45.336Z",
+    "resultado": "Después de reiniciar el backend: mismos 4 IDs de movimiento, aforo 0 y consulta Angular correcta."
+  }
+}
