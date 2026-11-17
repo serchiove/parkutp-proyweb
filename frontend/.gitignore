@@ -42,3 +42,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Evidencias temporales de las pruebas de integración
+/.angular/evidencias-integracion/
