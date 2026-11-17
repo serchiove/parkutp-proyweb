@@ -22,7 +22,7 @@ assert.equal(sede.status(), 201, 'Crear sede exclusiva de pruebas');
 const parkResponse = await api.post('/api/estacionamientos', { headers, data: { sedeId, nombre: `Zona Ricardo ${suffix}`, capacidad: 5, activo: true } });
 assert.equal(parkResponse.status(), 201);
 const parking = await parkResponse.json();
-const output = new URL('../../entrega-ricardo/evidencias/api-real/', import.meta.url);
+const output = new URL('../../docs/ricardo/evidencias/api-real/', import.meta.url);
 await mkdir(output, { recursive: true });
 const server = crearServidor(fileURLToPath(new URL('../dist/ricardo/browser/', import.meta.url)));
 await new Promise((resolve, reject) => { server.once('error', reject); server.listen(4200, 'localhost', resolve); });

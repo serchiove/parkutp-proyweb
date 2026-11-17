@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$repo = Split-Path $PSScriptRoot -Parent
+$repo = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $config = Join-Path $repo '.env'
 if (-not (Test-Path -LiteralPath $config)) {
     function Nueva-Clave {

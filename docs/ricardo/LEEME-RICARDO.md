@@ -13,7 +13,7 @@ Las rutas de accesos, operación e historial ya están incorporadas en el AppShe
 En esta laptop ya se comprobó PostgreSQL 18.7 y quedó preparada la base de demostración. Para futuros arranques, desde la raíz `parkutp-proyweb`, ejecuta:
 
 ```powershell
-.\entrega-ricardo\Iniciar-PruebaLocal.ps1
+.\docs\ricardo\Iniciar-PruebaLocal.ps1
 ```
 
 El script carga las claves del `.env` local (excluido de Git) y llama al iniciador original con `-DemoLocal`. No necesitas la contraseña del usuario `postgres` de la instalación principal: esta base independiente usa el puerto 55432 y datos dentro de `parkutp/.local-data`. Usuarios de la web: `admin`, `operador`, `consulta`; la contraseña de prueba está en el valor `DEMO_PASSWORD` del `.env`. No cambiar ese valor para intentar actualizar una contraseña de cuentas ya creadas.

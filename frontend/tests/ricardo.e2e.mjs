@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { crearServidor } from '../serve-ricardo.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
-const output = new URL(process.env.EVIDENCE_DIR ?? '../../entrega-ricardo/evidencias/frontend-simulado/', import.meta.url);
+const output = new URL(process.env.EVIDENCE_DIR ?? '../../docs/ricardo/evidencias/frontend-simulado/', import.meta.url);
 await mkdir(output, { recursive: true });
 const server = crearServidor(fileURLToPath(new URL(process.env.BUILD_DIR ?? '../dist/ricardo/browser/', import.meta.url)));
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));

@@ -5,7 +5,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { crearServidor } from '../serve-ricardo.mjs';
 const { chromium, request } = createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
-const output = new URL('../../entrega-ricardo/evidencias/api-real/', import.meta.url);
+const output = new URL('../../docs/ricardo/evidencias/api-real/', import.meta.url);
 const report = JSON.parse(await readFile(new URL('resultados.json', output), 'utf8'));
 const config = await readFile(new URL('../../.env', import.meta.url), 'utf8');
 const password = config.split(/\r?\n/).find(s => s.startsWith('DEMO_PASSWORD='))?.slice(14).replace(/^['"]|['"]$/g, '');
