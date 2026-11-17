@@ -1,0 +1,68 @@
+<header class="page-heading">
+  <div><span class="eyebrow">PANEL DE GESTIÓN <span>›</span> SEDES</span><h1>Sedes</h1>
+    <p>Organiza las sedes universitarias y sus estacionamientos.</p></div>
+  <span class="heading-icon" aria-hidden="true">⌖</span>
+</header>
+@if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+@if (exito()) { <p class="notice success" role="status">{{ exito() }}</p> }
+@if (esAdmin()) {
+  <section class="card">
+    <span class="section-kicker">CONFIGURACIÓN DE SEDES</span><h2>{{ editando() ? 'Editar sede' : 'Nueva sede' }}</h2>
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <fieldset class="form-fieldset" [disabled]="guardando() || cargando() || !cargaCorrecta()">
+        <div class="fields">
+          <label for="sede-id">Código de sede
+            <input id="sede-id" formControlName="id" maxlength="64" autocomplete="off" placeholder="Ej.: AQP-PARRA"
+              [attr.aria-invalid]="form.controls.id.touched && form.controls.id.invalid" aria-describedby="sede-id-help sede-id-error">
+            <small id="sede-id-help">Letras, números, guion o guion bajo. El código se conserva al editar.</small>
+            @if (form.controls.id.touched && form.controls.id.invalid) {
+              <span class="field-error" id="sede-id-error">Escribe un código válido de 1 a 64 caracteres.</span>
+            }
+          </label>
+          <label for="sede-nombre">Nombre
+            <input id="sede-nombre" formControlName="nombre" maxlength="120" autocomplete="off"
+              [attr.aria-invalid]="form.controls.nombre.touched && form.controls.nombre.invalid" aria-describedby="sede-nombre-error">
+            @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+              <span class="field-error" id="sede-nombre-error">Escribe un nombre de 1 a 120 caracteres, sin dejarlo en blanco.</span>
+            }
+          </label>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" type="submit">{{ guardando() ? 'Guardando…' : editando() ? 'Guardar cambios' : 'Crear sede' }}</button>
+          @if (editando()) { <button type="button" (click)="cancelar()">Cancelar edición</button> }
+        </div>
+      </fieldset>
+    </form>
+  </section>
+} @else { <p class="notice">Puedes consultar las sedes. Solo ADMIN puede administrarlas.</p> }
+@if (porEliminar(); as sede) {
+  <section class="confirmation" role="region" aria-label="Confirmar eliminación de sede">
+    <h2>¿Eliminar «{{ sede.nombre }}»?</h2><p>No podrás eliminar una sede con estacionamientos asociados.</p>
+    <div class="actions">
+      <button class="danger" type="button" [disabled]="guardando()" (click)="eliminar()">Confirmar eliminación</button>
+      <button type="button" [disabled]="guardando()" (click)="porEliminar.set(null)">Cancelar eliminación</button>
+    </div>
+  </section>
+}
+<section class="card" [attr.aria-busy]="cargando()">
+  <div class="section-heading"><div><span class="section-kicker">SEDES UNIVERSITARIAS</span><h2>Sedes registradas</h2></div>
+    <button type="button" [disabled]="cargando() || guardando()" (click)="cargar()">Actualizar listado</button></div>
+  @if (cargando()) { <p role="status">Cargando sedes…</p> }
+  @else if (cargaCorrecta() && !registros().length) { <p>No hay sedes registradas.</p> }
+  @else if (!cargaCorrecta()) { <p>No se pudo actualizar el listado. Puedes volver a intentarlo.</p> }
+  @if (!cargando() && cargaCorrecta() && registros().length) {
+    <div class="table-wrap"><table>
+      <thead><tr><th scope="col">Código</th><th scope="col">Nombre</th>@if (esAdmin()) { <th scope="col">Acciones</th> }</tr></thead>
+      <tbody>@for (sede of registros(); track sede.id) {
+        <tr><td>{{ sede.id }}</td><td class="name">{{ sede.nombre }}</td>
+          @if (esAdmin()) { <td>
+            <button type="button" [disabled]="guardando()" (click)="editar(sede)" [attr.aria-label]="'Editar sede ' + sede.nombre">Editar</button>
+            <button class="danger" type="button" [disabled]="guardando()" (click)="confirmarEliminacion(sede)" [attr.aria-label]="'Eliminar sede ' + sede.nombre">Eliminar</button>
+          </td> }
+        </tr>
+      }</tbody>
+    </table></div>
+  }
+</section>
+
+<app-aviso-cambios />
