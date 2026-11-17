@@ -37,3 +37,20 @@ Los scripts de navegador están en `frontend/tests/ricardo.*.mjs`. Las capturas 
 La entrega de Ricardo reporta compilaciones aprobadas, 24 comprobaciones con API simulada y 14 con API real. También reporta la persistencia de cuatro movimientos después de reiniciar el backend y PostgreSQL. Estos resultados corresponden a las pruebas documentadas por Ricardo; esta nota solo registra la integración de rutas y navegación.
 
 La configuración local permanece en `.env` y no debe subirse. No se deben incluir contraseñas, tokens completos ni datos personales en evidencias.
+
+## Verificación adicional del frontend integrado
+
+Después de incorporar la navegación y el diseño unificados se comprueba el recorrido desde el menú principal y los permisos por rol. Las pruebas usan el aforo numérico y la cantidad de registros, de modo que no dependen de las etiquetas anteriores de las tarjetas.
+
+Para repetirlas desde `frontend`, compila la entrada normal y ejecuta:
+
+```powershell
+npm run build
+$env:BUILD_DIR = '../dist/frontend/browser/'
+$env:EVIDENCE_DIR = '../.angular/evidencias-integracion/'
+node tests/ricardo.e2e.mjs
+```
+
+La prueba requiere Playwright y Edge, inicia su propio servidor y simula la API. Los resultados de esta revisión se guardan en `docs/ricardo/evidencias/integracion-rutas/`. Las pruebas previas con PostgreSQL se conservan en `api-real/`.
+
+Resultado de la revisión del 17 de noviembre de 2026: compilación normal de producción y 25 comprobaciones de navegador aprobadas después de incorporar el diseño y la navegación por rol de main.
