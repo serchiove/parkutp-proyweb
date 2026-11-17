@@ -4,9 +4,9 @@ Fecha: 17 de noviembre de 2026.
 
 ## Qué se implementó
 
-Se añadieron tres pantallas Angular conectadas a los endpoints REST que ya trae el backend. Todo el código del módulo está en `frontend/src/app/features/gestion-estacionamientos/`. El aporte conserva los archivos de autenticación, rutas principales, menú, sedes, estacionamientos, estilos globales, backend y dependencias. La rama parte de la actualización de diseño del coordinador (ea613e4) y reutiliza su tipografía mediante las variables existentes.
+Se añadieron tres pantallas Angular conectadas a los endpoints REST que ya trae el backend. Todo el código del módulo está en `frontend/src/app/features/gestion-estacionamientos/`. El aporte conserva autenticación, sedes, estacionamientos, estilos globales, backend y dependencias. La integración posterior conecta las tres pantallas en las rutas principales y agrega Accesos al menú. La rama parte de la actualización de diseño del coordinador (ea613e4) y reutiliza su tipografía mediante las variables existentes.
 
-La integración de las rutas principales queda preparada para revisión del coordinador. Para revisar este avance sin tocar esas rutas se agregó una entrada de prueba independiente. El arranque habitual con `npm start` sigue mostrando las pantallas provisionales hasta que el coordinador integre las rutas.
+Las rutas de accesos, operación e historial ya están incorporadas en el AppShell protegido. Se pueden abrir con el arranque normal `npm start`. La entrada de revisión independiente se conserva como herramienta opcional.
 
 ## Cómo abrirlo y probarlo contra la API real
 
@@ -18,7 +18,7 @@ En esta laptop ya se comprobó PostgreSQL 18.7 y quedó preparada la base de dem
 
 El script carga las claves del `.env` local (excluido de Git) y llama al iniciador original con `-DemoLocal`. No necesitas la contraseña del usuario `postgres` de la instalación principal: esta base independiente usa el puerto 55432 y datos dentro de `parkutp/.local-data`. Usuarios de la web: `admin`, `operador`, `consulta`; la contraseña de prueba está en el valor `DEMO_PASSWORD` del `.env`. No cambiar ese valor para intentar actualizar una contraseña de cuentas ya creadas.
 
-Deja esa terminal abierta y, en otra terminal dentro de `frontend`, ejecuta `node preview-ricardo.mjs`. Ambos procesos deben estar encendidos. Con Ctrl+C detienes cada proceso; la base local puede detenerse con `parkutp/scripts/Detener-PostgresLocal.ps1`.
+Deja esa terminal abierta y, en otra terminal dentro de `frontend`, ejecuta `npm start`. Ambos procesos deben estar encendidos. Con Ctrl+C detienes cada proceso; la base local puede detenerse con `parkutp/scripts/Detener-PostgresLocal.ps1`.
 
 1. Levanta el backend y PostgreSQL siguiendo el README original o `parkutp/docs/Docker.md`. La URL esperada por el frontend existente es `http://localhost:8081/api`. Usa las credenciales que configuró el equipo; esta entrega no cambia ni agrega usuarios o contraseñas.
 2. Abre una terminal en `frontend`.
@@ -26,13 +26,13 @@ Deja esa terminal abierta y, en otra terminal dentro de `frontend`, ejecuta `nod
 4. Ejecuta:
 
 ```powershell
-node preview-ricardo.mjs
+npm start
 ```
 
 5. Abre `http://localhost:4200/operacion`. Si no tienes sesión, se muestra el login original. Usa `localhost`, porque es el origen autorizado por defecto en el backend.
 6. Navega entre Accesos, Operación e Historial mediante las pestañas dentro de la pantalla. La barra lateral del coordinador se conserva.
 
-El puerto 4200 debe estar libre; detén primero cualquier `ng serve` que use ese puerto. La vista de revisión compila una vez: después de editar el código, detén con Ctrl+C y vuelve a ejecutar el comando. Para recarga automática, el equipo puede integrar las rutas y usar su `npm start` habitual.
+El puerto 4200 debe estar libre; detén primero cualquier `ng serve` que use ese puerto. El servidor de desarrollo de Angular recarga los cambios automáticamente mientras está abierto.
 
 ## Explicación de cada implementación
 
@@ -129,6 +129,8 @@ Al registrar `abc-123` como ingreso:
 
 ## Validación realizada y límites
 
+La integración posterior aprobó 25 comprobaciones de navegador con API simulada usando la compilación normal de producción, incluida la navegación desde las tres opciones del menú principal. El reporte y una captura del menú integrado están en `evidencias/integracion-rutas/`. Las compilaciones normales de desarrollo y producción también pasaron.
+
 - Compilación Angular de desarrollo de las tres pantallas: aprobada.
 - Compilación de producción: aprobada, con advertencias de tamaño en los estilos originales de login y app-shell.
 - 24 comprobaciones de navegador con Microsoft Edge y API simulada: aprobadas. Incluyen CRUD de accesos, errores 409, validación de placa, ingresos y salidas, UUID y reintentos tras navegar, aforo, filtros, respuestas tardías, permisos, conexión, sesión vencida y ancho móvil.
@@ -136,7 +138,7 @@ Al registrar `abc-123` como ingreso:
 - Recorrido real completado con Angular, Spring Boot y PostgreSQL 18.7: 14 comprobaciones aprobadas. Se comprobaron CRUD de accesos, errores reales, ingreso/salida con placa y sin placa, aforo, filtros y permisos. Capturas y resultados en `evidencias/api-real/`.
 - Persistencia comprobada tras reiniciar backend y base local: se conservaron los mismos cuatro movimientos y aforo cero; el historial de Angular los mostró correctamente.
 - La compilación inicial del backend ejecutó 15 pruebas aprobadas y omitió 57 pruebas que requieren la base dedicada `TEST_DB_URL`. El recorrido real anterior se ejecutó por separado en la base de demostración; no equivale a ejecutar esas 57 pruebas.
-- El aporte se prepara en la rama `ricardo/accesos-operacion-historial` del repositorio del equipo, sobre `origin/main`. El PR solicita coordinar la incorporación de rutas y la ubicación de Accesos en el menú antes de integrar.
+- El aporte se prepara en la rama `ricardo/accesos-operacion-historial` del repositorio del equipo, sobre `origin/main`. El PR #27 incorporó el módulo. La rama ricardo/integracion-rutas-menu propone conectar sus rutas y agregar Accesos al menú para revisión de Sergio.
 
 ## Repetir las pruebas automatizadas
 

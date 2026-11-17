@@ -19,5 +19,5 @@ foreach ($line in Get-Content -LiteralPath $config) {
 if (-not $env:JWT_SECRET -or -not $env:DEMO_PASSWORD) { throw 'Faltan JWT_SECRET o DEMO_PASSWORD en .env.' }
 Write-Host 'Usuarios: admin, operador y consulta. Contraseña: valor DEMO_PASSWORD del archivo .env local.'
 Write-Host 'La base de demostración usa 127.0.0.1:55432 y conserva datos en parkutp/.local-data.'
-Write-Host 'Para Angular, abre otra terminal en frontend y ejecuta: node preview-ricardo.mjs'
+Write-Host 'Para Angular, abre otra terminal en frontend y ejecuta: npm start'
 & (Join-Path $repo 'parkutp/scripts/Iniciar.ps1') -DemoLocal
