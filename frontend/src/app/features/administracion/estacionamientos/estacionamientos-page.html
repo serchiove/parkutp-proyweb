@@ -1,0 +1,70 @@
+<header class="page-heading">
+  <div><span class="eyebrow">PANEL DE GESTIÓN <span>›</span> ESTACIONAMIENTOS</span><h1>Estacionamientos</h1>
+    <p>Consulta y administra las zonas de estacionamiento de cada sede.</p></div>
+  <span class="heading-icon" aria-hidden="true">P</span>
+</header>
+@if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+@if (exito()) { <p class="notice success" role="status">{{ exito() }}</p> }
+@if (esAdmin()) {
+  @if (cargaCorrecta() && !sedes().length) { <p class="notice">Primero registra una sede desde el módulo Sedes para crear un estacionamiento.</p> }
+  <section class="card">
+    <span class="section-kicker">CONFIGURACIÓN DE ZONAS</span><h2>{{ editando() ? 'Editar estacionamiento' : 'Nuevo estacionamiento' }}</h2>
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <fieldset class="form-fieldset" [disabled]="guardando() || cargando() || !cargaCorrecta() || !sedes().length">
+        <div class="fields">
+          <label for="zona-sede">Sede
+            <select id="zona-sede" formControlName="sedeId" [attr.aria-invalid]="form.controls.sedeId.touched && form.controls.sedeId.invalid" aria-describedby="zona-sede-error">
+              <option value="">Selecciona una sede</option>
+              @for (sede of sedes(); track sede.id) { <option [value]="sede.id">{{ sede.nombre }} ({{ sede.id }})</option> }
+            </select>
+            @if (form.controls.sedeId.touched && form.controls.sedeId.invalid) { <span class="field-error" id="zona-sede-error">Selecciona una sede.</span> }
+          </label>
+          <label for="zona-nombre">Nombre
+            <input id="zona-nombre" formControlName="nombre" maxlength="120" autocomplete="off" [attr.aria-invalid]="form.controls.nombre.touched && form.controls.nombre.invalid" aria-describedby="zona-nombre-error">
+            @if (form.controls.nombre.touched && form.controls.nombre.invalid) { <span class="field-error" id="zona-nombre-error">Escribe un nombre de 1 a 120 caracteres, sin dejarlo en blanco.</span> }
+          </label>
+          <label for="zona-capacidad">Capacidad total
+            <input id="zona-capacidad" type="number" formControlName="capacidad" min="1" max="10000" step="1" [attr.aria-invalid]="form.controls.capacidad.touched && form.controls.capacidad.invalid" aria-describedby="zona-capacidad-error">
+            @if (form.controls.capacidad.touched && form.controls.capacidad.invalid) { <span class="field-error" id="zona-capacidad-error">Ingresa una capacidad entera entre 1 y 10000.</span> }
+          </label>
+        </div>
+        <label class="checkbox-label" for="zona-activo"><input id="zona-activo" type="checkbox" formControlName="activo"> Habilitado para recibir vehículos</label>
+        <p><small>Al crear se generan los accesos de entrada y salida. La capacidad no puede ser menor que la ocupación actual; una zona con historial conserva su sede.</small></p>
+        <div class="actions">
+          <button class="btn-primary" type="submit">{{ guardando() ? 'Guardando…' : editando() ? 'Guardar cambios' : 'Crear estacionamiento' }}</button>
+          @if (editando()) { <button type="button" (click)="cancelar()">Cancelar edición</button> }
+        </div>
+      </fieldset>
+    </form>
+  </section>
+} @else { <p class="notice">Puedes consultar los estacionamientos. Solo ADMIN puede administrarlos.</p> }
+@if (porEliminar(); as zona) {
+  <section class="confirmation" role="region" aria-label="Confirmar eliminación de estacionamiento">
+    <h2>¿Eliminar «{{ zona.nombre }}»?</h2><p>Si tiene movimientos o dispositivos asociados no podrá eliminarse. Puedes deshabilitarlo para conservar el historial.</p>
+    <div class="actions">
+      <button class="danger" type="button" [disabled]="guardando()" (click)="eliminar()">Confirmar eliminación</button>
+      <button type="button" [disabled]="guardando()" (click)="porEliminar.set(null)">Cancelar eliminación</button>
+    </div>
+  </section>
+}
+<section class="card" [attr.aria-busy]="cargando()">
+  <div class="section-heading"><div><span class="section-kicker">ZONAS POR SEDE</span><h2>Estacionamientos registrados</h2></div>
+    <button type="button" [disabled]="cargando() || guardando()" (click)="cargar()">Actualizar listado</button></div>
+  @if (cargando()) { <p role="status">Cargando estacionamientos…</p> }
+  @else if (cargaCorrecta() && !registros().length) { <p>No hay estacionamientos registrados.</p> }
+  @else if (!cargaCorrecta()) { <p>No se pudo actualizar el listado. Puedes volver a intentarlo.</p> }
+  @if (!cargando() && cargaCorrecta() && registros().length) {
+    <div class="table-wrap"><table>
+      <thead><tr><th scope="col">Nombre</th><th scope="col">Sede</th><th scope="col">Capacidad</th><th scope="col">Ocupados</th><th scope="col">Estado</th>@if (esAdmin()) { <th scope="col">Acciones</th> }</tr></thead>
+      <tbody>@for (zona of registros(); track zona.id) {
+        <tr><td class="name">{{ zona.nombre }}</td><td>{{ zona.sedeNombre }}</td><td>{{ zona.capacidad }}</td><td>{{ zona.ocupados }}</td>
+          <td><span class="status-badge" [class.inactive]="!zona.activo">{{ zona.activo ? 'Activo' : 'Inactivo' }}</span></td>
+          @if (esAdmin()) { <td>
+            <button type="button" [disabled]="guardando()" (click)="editar(zona)" [attr.aria-label]="'Editar estacionamiento ' + zona.nombre">Editar</button>
+            <button class="danger" type="button" [disabled]="guardando()" (click)="confirmarEliminacion(zona)" [attr.aria-label]="'Eliminar estacionamiento ' + zona.nombre">Eliminar</button>
+          </td> }
+        </tr>
+      }</tbody>
+    </table></div>
+  }
+</section>
