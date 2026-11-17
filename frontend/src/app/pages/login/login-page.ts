@@ -26,7 +26,7 @@ export class LoginPage {
     this.auth.login(this.form.getRawValue()).pipe(finalize(() => this.loading.set(false))).subscribe({
       next: () => {
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-        const destination = returnUrl?.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/estacionamientos';
+        const destination = returnUrl?.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : this.auth.homePath();
         void this.router.navigateByUrl(destination);
       },
       error: (error: unknown) => this.errorMessage.set(this.getErrorMessage(error)),

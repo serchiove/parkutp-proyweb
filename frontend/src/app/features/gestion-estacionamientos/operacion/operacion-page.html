@@ -1,29 +1,39 @@
-<h1>Operación</h1>
-<p class="intro">Registra ingresos y salidas y consulta el aforo del estacionamiento.</p>
+<header class="page-heading">
+  <div>
+    <span class="eyebrow">PANEL DE GESTIÓN <span>›</span> OPERACIÓN</span>
+    <h1>{{ ctx.puedeOperar() ? 'Operación' : 'Aforo' }}</h1>
+    <p class="intro">{{ ctx.puedeOperar() ? 'Registra ingresos y salidas y consulta el aforo del estacionamiento.' : 'Consulta la capacidad y disponibilidad del estacionamiento.' }}</p>
+  </div>
+  <span class="heading-icon" aria-hidden="true">↔</span>
+</header>
 <app-parking-selector [disabled]="guardando() || actualizando() || !!pendiente()" [preferido]="pendiente()?.id" (changed)="cambiarEstacionamiento()" />
 @if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
 @if (exito()) { <p class="notice success" role="status">{{ exito() }}</p> }
 @if (aviso()) { <p class="notice error" role="alert">{{ aviso() }}</p> }
 @if (ctx.seleccionado(); as e) {
   <section class="card" aria-label="Aforo actual">
-    <h2>{{ e.nombre }} · {{ e.activo ? 'Activo' : 'Inactivo' }}</h2>
-    <div class="metrics">
-      <div>Capacidad<strong>{{ e.capacidad }}</strong></div>
-      <div>Ocupados<strong>{{ e.ocupados }}</strong></div>
-      <div>Disponibles<strong>{{ ctx.disponibles() }}</strong></div>
+    <div class="section-heading">
+      <div><span class="section-kicker">AFORO DEL ESTACIONAMIENTO</span><h2>{{ e.nombre }}</h2></div>
+      <span class="status-badge" [class.inactive]="!e.activo"><i></i>{{ e.activo ? 'Activo' : 'Inactivo' }}</span>
     </div>
-    <label for="aforo">Ocupación: {{ ctx.porcentaje() }} %</label>
+    <div class="metrics">
+      <div class="metric"><span>Capacidad</span><strong>{{ e.capacidad }}</strong></div>
+      <div class="metric occupied"><span>Ocupados</span><strong>{{ e.ocupados }}</strong></div>
+      <div class="metric available"><span>Disponibles</span><strong>{{ ctx.disponibles() }}</strong></div>
+    </div>
+    <div class="progress-heading"><label for="aforo">Ocupación actual</label><strong>{{ ctx.porcentaje() }} %</strong></div>
     <progress id="aforo" [value]="ctx.porcentaje()" max="100" [class.warning]="ctx.porcentaje() >= 80" [class.full]="ctx.porcentaje() >= 100" [class.inactive]="!e.activo">{{ ctx.porcentaje() }} %</progress>
     <p><small>El aforo se actualiza al seleccionar un estacionamiento, registrar un movimiento o pulsar Actualizar aforo.</small></p>
-    <button type="button" [disabled]="guardando() || actualizando()" (click)="actualizar()">{{ actualizando() ? 'Actualizando…' : 'Actualizar aforo' }}</button>
+    <button class="button-secondary" type="button" [disabled]="guardando() || actualizando()" (click)="actualizar()">{{ actualizando() ? 'Actualizando…' : 'Actualizar aforo' }}</button>
   </section>
   @if (ctx.puedeOperar()) {
     <section class="card">
+      <span class="section-kicker">REGISTRO DE MOVIMIENTOS</span>
       <h2>Registrar movimiento</h2>
       @if (!e.activo) { <p class="notice">El estacionamiento está inactivo. Se permiten salidas, pero no nuevos ingresos.</p> }
       @if (!ctx.disponibles()) { <p class="notice">No hay espacios disponibles. Actualiza el aforo si otro operador registró una salida.</p> }
       <form [formGroup]="form" (ngSubmit)="registrar()">
-        <fieldset [disabled]="guardando() || actualizando() || !!pendiente()" style="border: 0; padding: 0; margin: 0">
+        <fieldset class="form-fieldset" [disabled]="guardando() || actualizando() || !!pendiente()">
           <div class="fields">
             <label for="mov-tipo">Movimiento<select id="mov-tipo" formControlName="tipo"><option value="ENTRADA">Ingreso</option><option value="SALIDA">Salida</option></select></label>
             <label for="placa">Placa (opcional)
@@ -46,3 +56,5 @@
     </section>
   } @else { <p class="notice">Tu rol permite consultar el aforo. Registrar movimientos requiere ADMIN u OPERADOR.</p> }
 }
+
+

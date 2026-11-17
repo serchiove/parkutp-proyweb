@@ -1,8 +1,15 @@
-<h1>Historial</h1>
-<p class="intro">Consulta los movimientos por estacionamiento, fecha, placa y tipo.</p>
+<header class="page-heading">
+  <div>
+    <span class="eyebrow">PANEL DE GESTIÓN <span>›</span> HISTORIAL</span>
+    <h1>Historial</h1>
+    <p class="intro">Consulta los movimientos por estacionamiento, fecha, placa y tipo.</p>
+  </div>
+  <span class="heading-icon" aria-hidden="true">◷</span>
+</header>
 <app-parking-selector (changed)="cambiarEstacionamiento()" />
 @if (ctx.seleccionado()) {
   <section class="card">
+    <span class="section-kicker">BÚSQUEDA DE MOVIMIENTOS</span>
     <h2>Filtros de búsqueda</h2>
     <form [formGroup]="form" (ngSubmit)="buscar()">
       <div class="fields">
@@ -15,15 +22,15 @@
       </div>
       <div class="actions">
         <button class="btn-primary" type="submit" [disabled]="cargando()">Buscar</button>
-        <button type="button" (click)="limpiar()">Limpiar filtros</button>
-        <button type="button" [disabled]="cargando()" (click)="cargar()">Actualizar resultados</button>
+        <button class="button-secondary" type="button" (click)="limpiar()">Limpiar filtros</button>
+        <button class="button-secondary" type="button" [disabled]="cargando()" (click)="cargar()">Actualizar resultados</button>
       </div>
     </form>
     <p><small>Se muestran hasta 50 movimientos, del más reciente al más antiguo. Actualizar conserva los últimos filtros aplicados.</small></p>
   </section>
   @if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
   <section class="card" [attr.aria-busy]="cargando()">
-    <h2>Movimientos {{ cargando() ? '' : '(' + movimientos().length + ')' }}</h2>
+    <div class="section-heading"><div><span class="section-kicker">REGISTRO DEL ESTACIONAMIENTO</span><h2>Movimientos recientes</h2></div><span class="count-badge">{{ cargando() ? '…' : movimientos().length }}</span></div>
     @if (cargando()) { <p role="status">Consultando movimientos…</p> }
     @else if (!error() && !movimientos().length) { <p role="status">No hay movimientos para los filtros seleccionados.</p> }
     @if (movimientos().length >= 50) { <p class="notice">Se alcanzó el límite de 50 resultados. Precisa los filtros para consultar otros movimientos.</p> }
@@ -31,9 +38,10 @@
       <div class="table-wrap"><table>
         <thead><tr><th scope="col">ID</th><th scope="col">Fecha y hora (Perú)</th><th scope="col">Placa</th><th scope="col">Tipo</th><th scope="col">Origen</th><th scope="col">Acceso</th></tr></thead>
         <tbody>@for (m of movimientos(); track m.id) {
-          <tr><td>{{ m.id }}</td><td>{{ fechaLima(m.registradoEn) }}</td><td>{{ m.placa || 'Sin placa' }}</td><td>{{ m.tipo }}</td><td>{{ m.origen }}</td><td>{{ m.accesoId }}</td></tr>
+          <tr><td>{{ m.id }}</td><td>{{ fechaLima(m.registradoEn) }}</td><td class="plate-cell">{{ m.placa || 'Sin placa' }}</td><td><span class="movement-badge" [class.exit]="m.tipo === 'SALIDA'">{{ m.tipo === 'ENTRADA' ? 'Entrada' : 'Salida' }}</span></td><td>{{ m.origen }}</td><td>{{ m.accesoId }}</td></tr>
         }</tbody>
       </table></div>
     }
   </section>
 }
+

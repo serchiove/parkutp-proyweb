@@ -1,78 +1,39 @@
-# Integración propuesta para el coordinador
+# Integración de Accesos, Operación e Historial
 
-## Preparar la rama de Ricardo
+## Estado actual
 
-Ejecutar estos pasos dentro de la copia real del repositorio del equipo, después de actualizar la rama de integración acordada y comprobar que no hay trabajo local pendiente:
+Las tres pantallas de Ricardo están conectadas al frontend principal:
+
+| Ruta | Pantalla |
+| --- | --- |
+| `/accesos` | Gestión de accesos por estacionamiento |
+| `/operacion` | Registro de ingresos y salidas, y consulta de aforo |
+| `/historial` | Historial con filtros por fecha, placa y tipo |
+
+Las rutas se montan dentro de `AppShell`, que conserva la protección del `authGuard`. Se retiraron los placeholders de Operación e Historial y se añadió Accesos al menú lateral. Las rutas provisionales de Sedes y Estacionamientos se mantienen sin cambios.
+
+## Archivos de integración
+
+- `frontend/src/app/app.routes.ts`: importa `gestionEstacionamientoRoutes` dentro de las rutas protegidas.
+- `frontend/src/app/features/gestion-estacionamientos/gestion-estacionamientos.routes.ts`: declara las tres rutas con carga diferida.
+- `frontend/src/app/layout/app-shell/app-shell.ts`: incorpora Accesos a la navegación.
+
+Las pantallas reutilizan `AuthService`, `HttpClient`, el interceptor JWT y `API_BASE_URL`. No se cambió el backend ni el flujo de login.
+
+## Cómo ejecutar
+
+Desde `frontend`, inicia el frontend integrado con:
 
 ```powershell
-git status
-git switch -c ricardo/accesos-operacion-historial
+npm start
 ```
 
-Copiar únicamente las carpetas y archivos nuevos de esta entrega:
+La API debe estar disponible en `http://localhost:8081/api`. `preview-ricardo.mjs` sigue disponible como entrada aislada de revisión, pero ya no hace falta para navegar las rutas desde la aplicación principal.
 
-- `frontend/src/app/features/gestion-estacionamientos/`
-- `frontend/src/main.ricardo.ts`
-- `frontend/preview-ricardo.mjs`
-- `frontend/serve-ricardo.mjs`
-- `frontend/tests/ricardo.e2e.mjs`
-- `frontend/tests/ricardo.real.e2e.mjs`
-- `frontend/tests/ricardo.persistence.mjs`
-- `docs/ricardo/`
+## Pruebas y evidencias
 
-No copiar encima el proyecto completo del ZIP a un checkout actualizado: podría reemplazar avances recientes de otros compañeros. No subir `node_modules`, `dist`, `.angular`, credenciales ni archivos `.env`.
+Los scripts de navegador están en `frontend/tests/ricardo.*.mjs`. Las capturas y reportes se guardan en `docs/ricardo/evidencias/`, organizados en `api-real/` y `frontend-simulado/`.
 
-Revisar `git diff --stat` y `git status`. Seleccionar explícitamente los archivos del aporte al preparar el commit, evitando agregar archivos ajenos con `git add .`.
+La entrega de Ricardo reporta compilaciones aprobadas, 24 comprobaciones con API simulada y 14 con API real. También reporta la persistencia de cuatro movimientos después de reiniciar el backend y PostgreSQL. Estos resultados corresponden a las pruebas documentadas por Ricardo; esta nota solo registra la integración de rutas y navegación.
 
-## Cambio de rutas que debe revisar el coordinador
-
-`frontend/src/app/app.routes.ts` original no se modificó. Para integrar:
-
-1. Importar:
-
-```typescript
-import { gestionEstacionamientoRoutes } from './features/gestion-estacionamientos/gestion-estacionamientos.routes';
-```
-
-2. Dentro de `children` del `AppShell` protegido, retirar las dos rutas provisionales de `operacion` e `historial` y añadir:
-
-```typescript
-...gestionEstacionamientoRoutes,
-```
-
-Esto incorpora `/accesos`, `/operacion` e `/historial` bajo el `authGuard` existente. No duplicar las rutas de operación e historial: Angular toma la primera coincidencia y podría seguir mostrando el placeholder.
-
-Conservar las rutas de Melissa, la redirección inicial, login y comodín según la versión vigente del equipo. No copiar todo el archivo de rutas de una versión anterior.
-
-3. El menú actual ya tiene Operación e Historial. El coordinador puede decidir si agrega Accesos a la barra lateral, por ejemplo en `navigation` de `app-shell.ts`:
-
-```typescript
-{ label: 'Accesos', path: '/accesos', icon: '⇄' },
-```
-
-No es obligatorio cambiar el menú para revisar el aporte: las tres pantallas tienen pestañas internas. La ubicación definitiva de Accesos se debe acordar con el equipo.
-
-4. Ejecutar el arranque normal con `npm start`, comprobar las rutas y compilar con `npm run build`. La entrada `main.ricardo.ts` solo se usa para revisión aislada; no sustituye `main.ts` en la integración.
-
-## Borrador de PR
-
-Título: **Implementar accesos, operación e historial en Angular**
-
-Descripción sugerida:
-
-Se reemplazarán las pantallas provisionales de operación e historial por formularios y consultas conectados a la API existente. Se añade gestión de accesos por estacionamiento con creación, edición de nombre, eliminación confirmada y permisos de ADMIN. Operación registra entradas y salidas, actualiza aforo y conserva el UUID en envíos inciertos; historial combina filtros por fecha, placa y tipo.
-
-El aporte reutiliza AuthService, HttpClient y el interceptor JWT existentes. Los archivos actuales de sedes, estacionamientos, autenticación, backend, rutas principales y menú conservan su contenido. Se incluye una entrada independiente para revisar el avance antes de integrar las rutas.
-
-Validación: compilación de desarrollo y producción aprobadas; 24 comprobaciones de navegador con API simulada y 14 con Spring Boot y PostgreSQL 18.7 reales aprobadas. Se comprobó persistencia después de reiniciar backend y base local, conservando cuatro movimientos y aforo cero. Las capturas reales y simuladas están en carpetas separadas. La compilación del backend aprobó 15 pruebas y omitió 57 que requieren una base dedicada; estas últimas no se reportan como ejecutadas.
-
-Coordinación solicitada: confirmar si el coordinador incorporará `gestionEstacionamientoRoutes` bajo el AppShell protegido y si Accesos debe aparecer también en la barra lateral. No se deben conservar las rutas provisionales duplicadas de operación e historial.
-
-## Mensajes de commit sugeridos
-
-- `Implementar gestión de accesos por estacionamiento`
-- `Agregar registro de movimientos y consulta de aforo`
-- `Agregar historial con filtros y estados de consulta`
-- `Documentar integración y validar recorrido de Ricardo`
-
-Si todos los archivos se incorporan en una sola revisión, también es válido un commit de funcionalidad completo con el título del PR. El texto debe describir lo que se entrega y las pruebas que efectivamente se ejecutaron.
+La configuración local permanece en `.env` y no debe subirse. No se deben incluir contraseñas, tokens completos ni datos personales en evidencias.

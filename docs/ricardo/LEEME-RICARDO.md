@@ -4,9 +4,9 @@ Fecha: 17 de noviembre de 2026.
 
 ## Qué se implementó
 
-Se añadieron tres pantallas Angular conectadas a los endpoints REST que ya trae el backend. Todo el código del módulo está en `frontend/src/app/features/gestion-estacionamientos/`. El aporte conserva los archivos de autenticación, rutas principales, menú, sedes, estacionamientos, estilos globales, backend y dependencias. La rama parte de la actualización de diseño del coordinador (ea613e4) y reutiliza su tipografía mediante las variables existentes.
+Se añadieron tres pantallas Angular conectadas a los endpoints REST que ya trae el backend. Todo el código del módulo está en `frontend/src/app/features/gestion-estacionamientos/`. Las rutas ya están integradas como hijas del `AppShell` protegido; Accesos aparece en el menú y Operación e Historial reemplazan sus pantallas provisionales. Sedes y Estacionamientos conservan sus pantallas actuales. El módulo reutiliza el servicio de autenticación, el interceptor JWT y las variables visuales del proyecto.
 
-La integración de las rutas principales queda preparada para revisión del coordinador. Para revisar este avance sin tocar esas rutas se agregó una entrada de prueba independiente. El arranque habitual con `npm start` sigue mostrando las pantallas provisionales hasta que el coordinador integre las rutas.
+El arranque normal con `npm start` utiliza las rutas integradas. `preview-ricardo.mjs` se conserva como entrada opcional para revisar el módulo de manera aislada.
 
 ## Cómo abrirlo y probarlo contra la API real
 
@@ -18,21 +18,21 @@ En esta laptop ya se comprobó PostgreSQL 18.7 y quedó preparada la base de dem
 
 El script carga las claves del `.env` local (excluido de Git) y llama al iniciador original con `-DemoLocal`. No necesitas la contraseña del usuario `postgres` de la instalación principal: esta base independiente usa el puerto 55432 y datos dentro de `parkutp/.local-data`. Usuarios de la web: `admin`, `operador`, `consulta`; la contraseña de prueba está en el valor `DEMO_PASSWORD` del `.env`. No cambiar ese valor para intentar actualizar una contraseña de cuentas ya creadas.
 
-Deja esa terminal abierta y, en otra terminal dentro de `frontend`, ejecuta `node preview-ricardo.mjs`. Ambos procesos deben estar encendidos. Con Ctrl+C detienes cada proceso; la base local puede detenerse con `parkutp/scripts/Detener-PostgresLocal.ps1`.
+Deja esa terminal abierta y, en otra terminal dentro de `frontend`, ejecuta `npm start`. Ambos procesos deben estar encendidos. Con Ctrl+C detienes cada proceso; la base local puede detenerse con `parkutp/scripts/Detener-PostgresLocal.ps1`.
 
 1. Levanta el backend y PostgreSQL siguiendo el README original o `parkutp/docs/Docker.md`. La URL esperada por el frontend existente es `http://localhost:8081/api`. Usa las credenciales que configuró el equipo; esta entrega no cambia ni agrega usuarios o contraseñas.
 2. Abre una terminal en `frontend`.
 3. Instala las dependencias originales con `npm ci` si aún no están instaladas.
-4. Ejecuta:
+4. Ejecuta la aplicación integrada:
 
 ```powershell
-node preview-ricardo.mjs
+npm start
 ```
 
 5. Abre `http://localhost:4200/operacion`. Si no tienes sesión, se muestra el login original. Usa `localhost`, porque es el origen autorizado por defecto en el backend.
-6. Navega entre Accesos, Operación e Historial mediante las pestañas dentro de la pantalla. La barra lateral del coordinador se conserva.
+6. Navega entre Accesos, Operación e Historial desde el menú lateral o las pestañas de las pantallas.
 
-El puerto 4200 debe estar libre; detén primero cualquier `ng serve` que use ese puerto. La vista de revisión compila una vez: después de editar el código, detén con Ctrl+C y vuelve a ejecutar el comando. Para recarga automática, el equipo puede integrar las rutas y usar su `npm start` habitual.
+El puerto 4200 debe estar libre; detén primero cualquier `ng serve` que use ese puerto. `npm start` recarga los cambios automáticamente. La entrada `node preview-ricardo.mjs` compila una vez y queda disponible para una revisión aislada si se necesita.
 
 ## Explicación de cada implementación
 
@@ -164,6 +164,6 @@ El script abre su propio servidor en un puerto libre y lo cierra al terminar; no
 5. Historial: filtros y protección frente a respuestas tardías.
 6. Componentes compartidos y guía de integración.
 
-Consulta `INTEGRACION-Y-PR.md` para incorporar los archivos al repositorio actualizado y proponer la integración al coordinador.
+Consulta `INTEGRACION-Y-PR.md` para ver cómo quedaron conectadas las rutas y el menú en la integración actual.
 
 Las pruebas reales se pueden repetir con `node tests/ricardo.real.e2e.mjs` una vez iniciado el backend y con el puerto 4200 libre. Crea datos nuevos y deja evidencia. Después de reiniciar el backend, `node tests/ricardo.persistence.mjs` compara los mismos IDs y guarda una captura. Ambos scripts requieren Playwright y Edge, y leen las credenciales locales sin incorporarlas al reporte.

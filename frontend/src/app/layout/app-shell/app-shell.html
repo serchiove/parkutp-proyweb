@@ -1,13 +1,13 @@
 <div class="app-layout">
   <aside class="sidebar">
-    <a class="brand" routerLink="/estacionamientos">
+    <a class="brand" routerLink="/">
       <img class="brand-mark" src="/parkutp-symbol.svg" alt="">
       <span class="brand-name">Park<span>UTP</span><small>GESTIÓN DE ESTACIONAMIENTOS</small></span>
     </a>
 
     <div class="nav-caption">MENÚ PRINCIPAL</div>
     <nav aria-label="Navegación principal">
-      @for (item of navigation; track item.path) {
+      @for (item of navigation(); track item.path) {
         <a class="nav-link" [routerLink]="item.path" routerLinkActive="active"><span class="nav-icon">{{ item.icon }}</span>{{ item.label }}</a>
       }
     </nav>
@@ -23,7 +23,7 @@
 
   <section class="workspace">
     <header class="topbar">
-      <div class="breadcrumb"><span>ParkUTP</span><span class="crumb-separator">/</span><strong>Panel de gestión</strong></div>
+      <div class="breadcrumb"><span>ParkUTP</span><span class="crumb-separator">/</span><strong>{{ auth.session()?.rol === 'ADMIN' ? 'Administración' : auth.session()?.rol === 'OPERADOR' ? 'Operación' : 'Solo lectura' }}</strong></div>
       <div class="account">
         <span class="status-dot"></span><span class="account-status">Sesión activa</span>
         <span class="avatar">{{ (auth.session()?.usuario ?? 'U').slice(0, 1).toUpperCase() }}</span>
@@ -39,3 +39,4 @@
     <footer class="workspace-footer"><span class="footer-brand">ParkUTP</span><span>·</span> Sistema de gestión de estacionamientos</footer>
   </section>
 </div>
+

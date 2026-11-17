@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-// El coordinador puede incorporar estas rutas como hijas del AppShell protegido.
+// Estas rutas se montan como hijas del AppShell protegido por authGuard.
 export const gestionEstacionamientoRoutes: Routes = [
   { path: 'accesos', loadComponent: () => import('./accesos/accesos-page').then(m => m.AccesosPage) },
   { path: 'operacion', loadComponent: () => import('./operacion/operacion-page').then(m => m.OperacionPage) },

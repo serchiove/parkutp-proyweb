@@ -9,7 +9,7 @@ Las capturas de `evidencias/frontend-simulado/` corresponden a las 24 comprobaci
 1. Levantar PostgreSQL y Spring Boot con la configuración original del equipo. La API debe responder en `http://localhost:8081/api`.
 2. Contar con usuarios ADMIN, OPERADOR y CONSULTA, con sus credenciales reales de prueba.
 3. Usar una sede y un estacionamiento dedicados a pruebas, creados por el módulo de Melissa o por el procedimiento que indique el coordinador. Evitar alterar datos de otros compañeros.
-4. Iniciar la revisión con `node preview-ricardo.mjs` desde `frontend`, o usar `npm start` después de la integración de rutas.
+4. Desde `frontend`, ejecutar `npm start`. Las rutas de Accesos, Operación e Historial ya están integradas; `node preview-ricardo.mjs` queda como alternativa para una revisión aislada.
 
 ## Recorrido y resultados esperados
 
