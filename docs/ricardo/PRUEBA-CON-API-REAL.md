@@ -40,7 +40,7 @@ Para probar aforo lleno, usar un estacionamiento de capacidad pequeña y placas 
 
 ## Evidencias a guardar
 
-Crear una carpeta aparte `evidencias/api-real/` y guardar:
+Guardar las nuevas capturas en `docs/ricardo/evidencias/api-real/`:
 
 - Accesos con nombre editado y mensaje de éxito.
 - Confirmación de eliminación o conflicto por historial asociado.

@@ -18,7 +18,7 @@ Copiar únicamente las carpetas y archivos nuevos de esta entrega:
 - `frontend/tests/ricardo.e2e.mjs`
 - `frontend/tests/ricardo.real.e2e.mjs`
 - `frontend/tests/ricardo.persistence.mjs`
-- `entrega-ricardo/`
+- `docs/ricardo/`
 
 No copiar encima el proyecto completo del ZIP a un checkout actualizado: podría reemplazar avances recientes de otros compañeros. No subir `node_modules`, `dist`, `.angular`, credenciales ni archivos `.env`.
 

@@ -31,7 +31,7 @@
   "prueba_backend_postgresql": "14 comprobaciones reales aprobadas con PostgreSQL 18.7; persistencia de 4 movimientos comprobada después de reiniciar backend y base",
   "rutas_principales": "sin modificar; integración propuesta en INTEGRACION-Y-PR.md",
   "git_remoto": "https://github.com/serchiove/parkutp-proyweb; rama ricardo/accesos-operacion-historial; PR de coordinación",
-  "configuracion_local": "entrega-ricardo/Iniciar-PruebaLocal.ps1; claves en .env excluido del ZIP y Git",
+  "configuracion_local": "docs/ricardo/Iniciar-PruebaLocal.ps1; claves en .env excluido del ZIP y Git",
   "pruebas_java": "15 aprobadas, 57 omitidas por no configurar TEST_DB_URL; recorrido real ejecutado por separado",
   "base_del_equipo": "ea613e4; mejora de diseño y tipografía conservada sin cambios propios en archivos compartidos"
 }

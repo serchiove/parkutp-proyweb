@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { crearServidor } from '../serve-ricardo.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
-const output = new URL('../../entrega-ricardo/evidencias/frontend-simulado/', import.meta.url);
+const output = new URL('../../docs/ricardo/evidencias/frontend-simulado/', import.meta.url);
 await mkdir(output, { recursive: true });
 const server = crearServidor(fileURLToPath(new URL('../dist/ricardo/browser/', import.meta.url)));
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
@@ -286,7 +286,7 @@ try {
     await s.context.close();
   }
   await writeFile(new URL('resultados.json', output), JSON.stringify({ fecha: new Date().toISOString(), entorno: 'Frontend Angular con API simulada por Playwright; sin PostgreSQL', resultados: results }, null, 2));
-  console.log(`${results.length} comprobaciones completadas. Capturas en entrega-ricardo/evidencias/frontend-simulado.`);
+  console.log(`${results.length} comprobaciones completadas. Capturas en docs/ricardo/evidencias/frontend-simulado.`);
 } finally { await browser.close(); server.closeAllConnections(); server.close(); }
 
 function fileURL(name) {
