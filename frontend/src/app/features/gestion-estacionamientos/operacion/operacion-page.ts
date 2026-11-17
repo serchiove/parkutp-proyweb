@@ -12,7 +12,7 @@ import { PendingMovement } from '../shared/pending-movement';
   imports: [ReactiveFormsModule, ParkingSelector],
   providers: [ParkingContext, PendingMovement],
   templateUrl: './operacion-page.html',
-  styleUrl: '../shared/ricardo.scss',
+  styleUrl: '../shared/gestion-estacionamientos.scss',
 })
 export class OperacionPage {
   readonly ctx = inject(ParkingContext);

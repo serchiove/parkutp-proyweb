@@ -5,12 +5,12 @@ import { provideRouter, Routes, withComponentInputBinding } from '@angular/route
 import { App } from './app/app';
 import { routes } from './app/app.routes';
 import { authInterceptor } from './app/core/auth/auth.interceptor';
-import { ricardoRoutes } from './app/features/ricardo/ricardo.routes';
+import { gestionEstacionamientoRoutes } from './app/features/gestion-estacionamientos/gestion-estacionamientos.routes';
 
 // Entrada local de revisión. No modifica el router ni el menú del equipo.
-const propias = new Set(ricardoRoutes.map(r => r.path));
+const propias = new Set(gestionEstacionamientoRoutes.map(r => r.path));
 const previewRoutes: Routes = routes.map(route => route.children
-  ? { ...route, children: [...route.children.filter(child => !propias.has(child.path)), ...ricardoRoutes] }
+  ? { ...route, children: [...route.children.filter(child => !propias.has(child.path)), ...gestionEstacionamientoRoutes] }
   : route);
 
 bootstrapApplication(App, {

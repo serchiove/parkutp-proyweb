@@ -4,7 +4,7 @@ Fecha: 17 de noviembre de 2026.
 
 ## Qué se implementó
 
-Se añadieron tres pantallas Angular conectadas a los endpoints REST que ya trae el backend. Todo el código del módulo está en `frontend/src/app/features/ricardo/`. El aporte conserva los archivos de autenticación, rutas principales, menú, sedes, estacionamientos, estilos globales, backend y dependencias. La rama parte de la actualización de diseño del coordinador (ea613e4) y reutiliza su tipografía mediante las variables existentes.
+Se añadieron tres pantallas Angular conectadas a los endpoints REST que ya trae el backend. Todo el código del módulo está en `frontend/src/app/features/gestion-estacionamientos/`. El aporte conserva los archivos de autenticación, rutas principales, menú, sedes, estacionamientos, estilos globales, backend y dependencias. La rama parte de la actualización de diseño del coordinador (ea613e4) y reutiliza su tipografía mediante las variables existentes.
 
 La integración de las rutas principales queda preparada para revisión del coordinador. Para revisar este avance sin tocar esas rutas se agregó una entrada de prueba independiente. El arranque habitual con `npm start` sigue mostrando las pantallas provisionales hasta que el coordinador integre las rutas.
 
@@ -113,7 +113,7 @@ Si el registro termina correctamente pero falla la consulta de aforo, se muestra
 
 `shared/api-error.ts` convierte errores de conexión, 401, 403, 404 y mensajes de validación o negocio en texto para el usuario. Los errores 401 siguen siendo atendidos por el interceptor original, que redirige al login.
 
-`shared/ricardo.scss` contiene estilos limitados a estos componentes y reutiliza los colores y variables del proyecto. Incluye formularios adaptables y tablas con desplazamiento local para pantallas estrechas.
+`shared/gestion-estacionamientos.scss` contiene estilos limitados a estos componentes y reutiliza los colores y variables del proyecto. Incluye formularios adaptables y tablas con desplazamiento local para pantallas estrechas.
 
 ## Ejemplo del recorrido de un dato
 

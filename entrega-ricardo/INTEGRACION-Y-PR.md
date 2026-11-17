@@ -11,7 +11,7 @@ git switch -c ricardo/accesos-operacion-historial
 
 Copiar únicamente las carpetas y archivos nuevos de esta entrega:
 
-- `frontend/src/app/features/ricardo/`
+- `frontend/src/app/features/gestion-estacionamientos/`
 - `frontend/src/main.ricardo.ts`
 - `frontend/preview-ricardo.mjs`
 - `frontend/serve-ricardo.mjs`
@@ -31,13 +31,13 @@ Revisar `git diff --stat` y `git status`. Seleccionar explícitamente los archiv
 1. Importar:
 
 ```typescript
-import { ricardoRoutes } from './features/ricardo/ricardo.routes';
+import { gestionEstacionamientoRoutes } from './features/gestion-estacionamientos/gestion-estacionamientos.routes';
 ```
 
 2. Dentro de `children` del `AppShell` protegido, retirar las dos rutas provisionales de `operacion` e `historial` y añadir:
 
 ```typescript
-...ricardoRoutes,
+...gestionEstacionamientoRoutes,
 ```
 
 Esto incorpora `/accesos`, `/operacion` e `/historial` bajo el `authGuard` existente. No duplicar las rutas de operación e historial: Angular toma la primera coincidencia y podría seguir mostrando el placeholder.
@@ -66,7 +66,7 @@ El aporte reutiliza AuthService, HttpClient y el interceptor JWT existentes. Los
 
 Validación: compilación de desarrollo y producción aprobadas; 24 comprobaciones de navegador con API simulada y 14 con Spring Boot y PostgreSQL 18.7 reales aprobadas. Se comprobó persistencia después de reiniciar backend y base local, conservando cuatro movimientos y aforo cero. Las capturas reales y simuladas están en carpetas separadas. La compilación del backend aprobó 15 pruebas y omitió 57 que requieren una base dedicada; estas últimas no se reportan como ejecutadas.
 
-Coordinación solicitada: confirmar si el coordinador incorporará `ricardoRoutes` bajo el AppShell protegido y si Accesos debe aparecer también en la barra lateral. No se deben conservar las rutas provisionales duplicadas de operación e historial.
+Coordinación solicitada: confirmar si el coordinador incorporará `gestionEstacionamientoRoutes` bajo el AppShell protegido y si Accesos debe aparecer también en la barra lateral. No se deben conservar las rutas provisionales duplicadas de operación e historial.
 
 ## Mensajes de commit sugeridos
 

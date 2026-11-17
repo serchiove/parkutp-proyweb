@@ -51,7 +51,7 @@ async function capture(page, name) {
 try {
   const admin = await open('admin', 'accesos');
   const page = admin.page;
-  const nav = page.getByRole('navigation', { name: 'Módulos de Ricardo' });
+  const nav = page.getByRole('navigation', { name: 'Gestión de estacionamientos' });
   await page.getByRole('cell', { name: 'Acceso de ingreso', exact: true }).waitFor();
   check('Login Angular, CORS e interceptor JWT funcionan con la API real.');
   await page.getByRole('row').filter({ hasText: 'Acceso de salida' }).getByRole('button', { name: 'Eliminar', exact: true }).click();
@@ -122,7 +122,7 @@ try {
   await operador.page.getByRole('button', { name: 'Registrar movimiento' }).click();
   await operador.page.getByText(/Salida registrada: sin placa\. Movimiento #/).waitFor();
   check('OPERADOR registra ingreso y salida sin placa con la API real.');
-  await operador.page.getByRole('navigation', { name: 'Módulos de Ricardo' }).getByRole('link', { name: 'Accesos', exact: true }).click();
+  await operador.page.getByRole('navigation', { name: 'Gestión de estacionamientos' }).getByRole('link', { name: 'Accesos', exact: true }).click();
   await operador.page.getByText('Puedes consultar los accesos.').waitFor();
   assert.equal(await operador.page.getByRole('button', { name: 'Crear acceso', exact: true }).count(), 0);
   assert.deepEqual(operador.errors, []);

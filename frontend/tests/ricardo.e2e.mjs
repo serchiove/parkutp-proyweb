@@ -105,7 +105,7 @@ async function session(rol = 'ADMIN') {
 try {
   const { context, page, state, errors } = await session();
   check('Login original e interceptor: todas las solicitudes protegidas usan el JWT existente.');
-  const nav = page.getByRole('navigation', { name: 'Módulos de Ricardo' });
+  const nav = page.getByRole('navigation', { name: 'Gestión de estacionamientos' });
   await nav.getByRole('link', { name: 'Accesos', exact: true }).click();
   await page.getByRole('cell', { name: 'Ingreso principal', exact: true }).waitFor();
   await page.getByRole('button', { name: 'Crear acceso', exact: true }).click();
@@ -266,10 +266,10 @@ try {
 
   for (const rol of ['OPERADOR', 'CONSULTA']) {
     const s = await session(rol);
-    await s.page.getByRole('navigation', { name: 'Módulos de Ricardo' }).getByRole('link', { name: 'Accesos', exact: true }).click();
+    await s.page.getByRole('navigation', { name: 'Gestión de estacionamientos' }).getByRole('link', { name: 'Accesos', exact: true }).click();
     await s.page.getByText('Puedes consultar los accesos.').waitFor();
     assert.equal(await s.page.getByRole('button', { name: 'Crear acceso', exact: true }).count(), 0);
-    await s.page.getByRole('navigation', { name: 'Módulos de Ricardo' }).getByRole('link', { name: 'Operación', exact: true }).click();
+    await s.page.getByRole('navigation', { name: 'Gestión de estacionamientos' }).getByRole('link', { name: 'Operación', exact: true }).click();
     if (rol === 'OPERADOR') {
       await s.page.getByRole('button', { name: 'Registrar movimiento' }).waitFor();
       await s.page.getByRole('button', { name: 'Registrar movimiento' }).click();

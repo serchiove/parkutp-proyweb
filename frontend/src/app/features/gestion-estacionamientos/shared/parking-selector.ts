@@ -6,7 +6,7 @@ import { ParkingContext } from './parking-context';
   selector: 'app-parking-selector',
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <nav class="module-nav" aria-label="Módulos de Ricardo">
+    <nav class="module-nav" aria-label="Gestión de estacionamientos">
       <a routerLink="/accesos" routerLinkActive="selected" [queryParams]="{ estacionamiento: ctx.seleccionado()?.id }">Accesos</a>
       <a routerLink="/operacion" routerLinkActive="selected" [queryParams]="{ estacionamiento: ctx.seleccionado()?.id }">Operación</a>
       <a routerLink="/historial" routerLinkActive="selected" [queryParams]="{ estacionamiento: ctx.seleccionado()?.id }">Historial</a>
@@ -28,7 +28,7 @@ import { ParkingContext } from './parking-context';
       <p class="notice">No hay estacionamientos. Solicita a administración que registre uno.</p>
     }
   `,
-  styleUrl: './ricardo.scss',
+  styleUrl: './gestion-estacionamientos.scss',
 })
 export class ParkingSelector implements OnInit {
   readonly ctx = inject(ParkingContext);

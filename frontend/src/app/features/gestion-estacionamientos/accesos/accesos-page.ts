@@ -11,7 +11,7 @@ import { ParkingSelector } from '../shared/parking-selector';
   imports: [ReactiveFormsModule, ParkingSelector],
   providers: [ParkingContext],
   templateUrl: './accesos-page.html',
-  styleUrl: '../shared/ricardo.scss',
+  styleUrl: '../shared/gestion-estacionamientos.scss',
 })
 export class AccesosPage {
   readonly ctx = inject(ParkingContext);
