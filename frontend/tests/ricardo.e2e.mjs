@@ -8,10 +8,10 @@ const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
 const output = new URL(process.env.EVIDENCE_DIR ?? '../../docs/ricardo/evidencias/frontend-simulado/', import.meta.url);
 await mkdir(output, { recursive: true });
-const server = crearServidor(fileURLToPath(new URL(process.env.BUILD_DIR ?? '../dist/ricardo/browser/', import.meta.url)));
+const server = crearServidor(fileURLToPath(new URL(process.env.BUILD_DIR ?? '../dist/frontend/browser/', import.meta.url)));
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const baseURL = `http://127.0.0.1:${server.address().port}`;
-const browser = await chromium.launch({ channel: 'msedge', headless: true });
+const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL ?? (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
 const results = [];
 const check = (description) => { results.push(description); console.log('OK:', description); };
 

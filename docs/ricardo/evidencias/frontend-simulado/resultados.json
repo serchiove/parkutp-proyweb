@@ -1,8 +1,9 @@
 {
-  "fecha": "2026-11-17T16:33:20.392Z",
+  "fecha": "2026-11-18T17:10:10.574Z",
   "entorno": "Frontend Angular con API simulada por Playwright; sin PostgreSQL",
   "resultados": [
     "Login original e interceptor: todas las solicitudes protegidas usan el JWT existente.",
+    "Menú principal: Accesos, Historial y Operación abren las pantallas integradas.",
     "Accesos: formulario vacío no envía datos.",
     "Accesos: creación por API y normalización de espacios.",
     "Accesos: se muestra el conflicto 409 de tipo duplicado.",

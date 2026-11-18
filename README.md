@@ -1,283 +1,316 @@
 <div align="center">
 
+<img src="frontend/public/parkutp-symbol.svg" width="96" alt="Símbolo de ParkUTP" />
+
 # ParkUTP
 
 ### Gestión de estacionamientos universitarios
 
-**Desarrollo Web Integrado · Avance 3**<br>
-**Angular · Spring Boot · PostgreSQL**
+**Desarrollo Web Integrado · Avance 3**
 
-Sergio · Melissa · Ricardo
+Angular · Spring Boot · PostgreSQL
+
+**Sergio · Melissa · Ricardo**
+
+[Explorar las pantallas](#pantallas) · [Ejecutar el proyecto](#inicio-local) · [Revisar las pruebas](#pruebas-y-evidencias)
 
 </div>
 
-ParkUTP centraliza la administración de sedes y estacionamientos, registra ingresos y salidas y permite consultar la disponibilidad y el historial de movimientos. La interfaz Angular utiliza la API REST existente, con autenticación JWT y permisos por rol.
+---
 
-Los registros utilizados en la demostración son datos de prueba; no representan capacidades ni movimientos institucionales reales. La disponibilidad se calcula con los movimientos registrados, sin sensores físicos conectados.
+ParkUTP permite administrar sedes y estacionamientos, registrar ingresos y salidas y consultar el aforo y el historial desde una interfaz web con permisos por rol.
 
-## Navegación rápida
+La aplicación conecta **Angular con una API REST de Spring Boot y PostgreSQL**. Los registros mostrados son datos de demostración: no representan capacidades ni movimientos institucionales reales.
 
-- [Ejecutar en Windows](#ejecutar-en-windows)
-- [Pantallas y permisos](#pantallas-y-permisos)
-- [Arquitectura y estructura](#arquitectura-y-estructura)
-- [Configuración](#configuración)
-- [Verificación y pruebas](#verificación-y-pruebas)
-- [Demostración](#demostración)
+![Operación y disponibilidad del estacionamiento](docs/ricardo/evidencias/api-real/02-ingreso-aforo.png)
+
+*Registro de un ingreso desde Angular y actualización del aforo con la API real.*
+
+## Contenido
+
+- [Funciones y alcance](#funciones-y-alcance)
+- [Pantallas](#pantallas)
+- [Usuarios y permisos](#usuarios-y-permisos)
+- [Arquitectura](#arquitectura)
+- [Inicio local](#inicio-local)
+- [Pruebas y evidencias](#pruebas-y-evidencias)
+- [Recorrido para la demostración](#recorrido-para-la-demostración)
 - [Solución de problemas](#solución-de-problemas)
 - [Documentación y equipo](#documentación-y-equipo)
 
-## Funcionalidades actuales
+## Funciones y alcance
 
-| Módulo | Qué permite hacer |
-|---|---|
-| Sedes | Listar, crear, editar el nombre y eliminar cuando no existen dependencias. |
-| Estacionamientos | Administrar sede, nombre, capacidad y estado; generar los accesos iniciales de entrada y salida. |
-| Accesos | Consultar y administrar los puntos de entrada y salida de cada estacionamiento. |
-| Operación | Registrar movimientos, consultar ocupados y disponibles y actualizar el aforo. |
-| Historial | Buscar movimientos por fecha local de Perú, placa completa o parcial y tipo. |
-| Seguridad | Iniciar y cerrar sesión, enviar JWT mediante interceptor y aplicar permisos de ADMIN, OPERADOR y CONSULTA. |
-| Formularios | Validar datos, mostrar errores y confirmaciones, evitar envíos repetidos y advertir sobre cambios sin guardar en sedes y estacionamientos. |
+| Módulo | Funciones |
+|:---|:---|
+| **Sedes** | Crear, listar y editar sedes; confirmar la eliminación y mostrar restricciones por dependencias. |
+| **Estacionamientos** | Administrar sede, nombre, capacidad y estado. El backend genera los accesos iniciales de entrada y salida. |
+| **Accesos** | Crear, consultar, editar y eliminar accesos cuando las reglas de negocio lo permiten. |
+| **Operación** | Registrar entradas y salidas, consultar ocupados y disponibles y actualizar el aforo. |
+| **Historial** | Buscar movimientos por fecha de Perú, placa completa o parcial y tipo de movimiento. |
+| **Autenticación** | Iniciar sesión con JWT, aplicar permisos y conservar la sesión al recargar la pestaña. |
+| **Formularios** | Validar entradas, mostrar errores y avisar sobre cambios sin guardar en Sedes y Estacionamientos. |
 
-En Angular el aforo se actualiza al seleccionar un estacionamiento, registrar un movimiento o solicitar una actualización. **No hay actualización automática cada cinco segundos en esta interfaz.** Las vistas JSP/JSF del avance anterior siguen en el backend como implementación previa.
+El aforo se actualiza al seleccionar un estacionamiento, registrar un movimiento o solicitar una actualización. Los reintentos de movimientos utilizan un UUID para evitar duplicar la operación.
 
-## Ejecutar en Windows
+**Fuera del alcance actual:** reservas, cuentas de estudiantes, sensores y barreras físicas, recuperación de contraseñas y administración de usuarios.
 
-### Requisitos
+## Pantallas
 
-| Herramienta | Requisito del proyecto |
-|---|---|
-| Java | JDK 21 completo, con `java` y `javac`. |
-| PostgreSQL | Ejecutables instalados; la demo local se verificó con PostgreSQL 18. |
-| Node.js y npm | Node 24.15 o posterior dentro de la rama 24; también se admite Node 22.22.3 o posterior dentro de la rama 22, según el CLI instalado. |
-| Git | Clonar y actualizar el repositorio. |
-| Maven | Se utiliza el Wrapper incluido; no requiere instalación independiente. |
+Las capturas siguientes pertenecen a los recorridos documentados contra la API real. Los nombres y cantidades corresponden a registros de prueba.
 
-Comprueba el entorno en una terminal PowerShell:
+### Administración de estacionamientos
 
-```powershell
-java -version
-javac -version
-node --version
-npm --version
-```
+![Administración de estacionamientos](docs/melissa/evidencias/api-real/01-estacionamiento-editado.png)
 
-La primera instalación descarga dependencias de Maven y npm. No necesitas instalar Angular CLI globalmente.
+*Capacidad y estado editados desde Angular. El listado refleja la respuesta del backend.*
 
-### 1. Abrir la raíz del repositorio
+<details>
+<summary><strong>Ver Sedes y protección de registros relacionados</strong></summary>
 
-Si aún no tienes una copia:
+![Sede con estacionamientos asociados](docs/melissa/evidencias/api-real/02-sede-con-zona-409.png)
 
-```powershell
-git clone https://github.com/serchiove/parkutp-proyweb.git
-cd .\parkutp-proyweb
-```
+La API impide eliminar una sede que tiene estacionamientos asociados y la interfaz muestra el motivo.
 
-Abre esta carpeta en VS Code. La **raíz Git** contiene `README.md`, `frontend`, `parkutp` y `docs`. El proyecto Java está dentro de `parkutp`; Angular está dentro de `frontend`.
+</details>
 
-### 2. Terminal del backend y la base local
+<details>
+<summary><strong>Ver gestión de accesos</strong></summary>
 
-Desde la raíz Git:
+![Gestión de accesos](docs/ricardo/evidencias/api-real/01-accesos-crud.png)
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\docs\ricardo\Iniciar-PruebaLocal.ps1
-```
+El administrador configura los accesos del estacionamiento. Los accesos utilizados por movimientos conservan su integridad referencial.
 
-Este iniciador prepara un `.env` local si no existe, carga `JWT_SECRET`, `DEMO_PASSWORD` y `CORS_ORIGENES`, e inicia el script original en modo `DemoLocal`. Compila el WAR y arranca Spring Boot. Mantén la terminal abierta y espera el mensaje de inicio de la aplicación.
+</details>
 
-| Servicio | Dirección predeterminada |
-|---|---|
-| API REST | `http://localhost:8081/api` |
-| PostgreSQL de demostración | `127.0.0.1:55432` |
-| Base y usuario locales | `parkutp` / `parkutp_local` |
-| Datos persistentes | `parkutp/.local-data/` |
+### Historial de movimientos
 
-La demo usa una instancia independiente y autenticación PostgreSQL de confianza local. No modifica el servicio habitual de PostgreSQL en 5432. Este modo es para demostración local.
+![Historial filtrado](docs/ricardo/evidencias/api-real/04-historial-filtrado.png)
 
-El script intenta detectar Adoptium JDK 21 y PostgreSQL en sus carpetas de instalación habituales. Si no encuentra Java, define `JAVA_HOME` con la ruta real del JDK. Para otra instalación de PostgreSQL, consulta el [inicio manual y la opción `-PgBin`](docs/Guia-APF2.md#4-demo-local-independiente).
+*Filtros combinados por fecha, placa y tipo de movimiento.*
 
-**Cuentas:** `admin`, `operador` y `consulta`. La contraseña inicial está en `DEMO_PASSWORD` del `.env` local. El inicializador solo crea cuentas que no existen: cambiar esa variable no cambia la contraseña de una cuenta ya creada. No compartas el archivo ni sus claves.
+<details>
+<summary><strong>Ver la interfaz del rol CONSULTA</strong></summary>
 
-### 3. Otra terminal para Angular
+![Vista de consulta](docs/ricardo/evidencias/api-real/06-rol-consulta.png)
 
-Abre una terminal nueva desde la raíz Git:
+La vista permite consultar aforo sin mostrar controles para registrar movimientos. El backend también comprueba los permisos.
 
-```powershell
-cd .\frontend
-npm ci
-npm start
-```
+</details>
 
-`npm ci` instala las dependencias de `package-lock.json`; no hace falta repetirlo en cada arranque si las dependencias no cambiaron. Abre [ParkUTP en Angular](http://localhost:4200/login) e inicia sesión.
-
-**Deben estar activos ambos procesos:** Angular en 4200 y Spring Boot en 8081. Abrir Angular por sí solo no inicia la API. Usa `localhost` para coincidir con el origen CORS predeterminado.
-
-### 4. Detener la demostración
-
-Pulsa `Ctrl+C` en las terminales de Angular y Java. Para detener además la instancia PostgreSQL local, desde la raíz Git:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\parkutp\scripts\Detener-PostgresLocal.ps1
-```
-
-Los datos se conservan. No borres `.local-data` para solucionar errores de conexión.
-
-### Otras modalidades
-
-- [Backend con PostgreSQL propio, variables y compilación manual](docs/Guia-APF2.md#3-instalación-paso-a-paso).
-- [Backend y PostgreSQL mediante Docker](parkutp/docs/Docker.md). Angular se ejecuta por separado, salvo que se configure otro despliegue.
-- [Guía específica del frontend](frontend/README.md).
-
-## Pantallas y permisos
-
-| Ruta Angular | Función |
-|---|---|
-| `/login` | Autenticación. |
-| `/sedes` | Administración de sedes. |
-| `/estacionamientos` | Administración de estacionamientos. |
-| `/accesos` | Gestión o consulta de accesos. |
-| `/operacion` | Aforo y registro de movimientos según el rol. |
-| `/historial` | Consulta con filtros. |
+## Usuarios y permisos
 
 | Acción | ADMIN | OPERADOR | CONSULTA |
-|---|:---:|:---:|:---:|
-| Consultar aforo e historial | Sí | Sí | Sí |
-| Consultar accesos | Sí | Sí | Sí |
+|:---|:---:|:---:|:---:|
+| Administrar sedes y estacionamientos | Sí | No | No |
+| Administrar accesos | Sí | No | No |
 | Registrar ingresos y salidas | Sí | Sí | No |
-| Crear, editar o eliminar recursos | Sí | No | No |
+| Consultar accesos, aforo e historial | Sí | Sí | Sí |
 
-El menú de sedes y estacionamientos se muestra a ADMIN. Sus formularios también restringen la modificación por rol. El backend aplica la autorización efectiva de cada petición. La sesión Angular se mantiene en memoria: recargar la página requiere volver a iniciar sesión.
+Las cuentas de demostración son `admin`, `operador` y `consulta`. La contraseña se configura localmente mediante `DEMO_PASSWORD` y no se publica en el repositorio.
 
-## Arquitectura y estructura
+La sesión se conserva en `sessionStorage`: **recargar la pestaña mantiene el acceso**. Cerrar sesión o recibir una respuesta 401 de la API elimina la sesión almacenada. La API valida el JWT y decide los permisos efectivos.
 
-```text
-Angular → API REST → Controller → Service → Repository JPA → PostgreSQL
-```
+## Arquitectura
 
-Angular reutiliza `AuthService`, el interceptor JWT y la navegación común. Spring Boot valida solicitudes y permisos; los servicios aplican reglas de negocio y transacciones; JPA/Hibernate accede a PostgreSQL.
+| Capa | Tecnología | Responsabilidad |
+|:---|:---|:---|
+| Interfaz | Angular 22, TypeScript y SCSS | Rutas, formularios, navegación por rol y consumo HTTP. |
+| API | Java 21 y Spring Boot 3.2.5 | Reglas de negocio, validaciones y endpoints REST. |
+| Seguridad | Spring Security y JWT | Autenticación y autorización. |
+| Persistencia | JPA/Hibernate y PostgreSQL | Entidades, consultas y transacciones. |
+| Entorno local | Docker Compose | Backend y base de datos con volumen persistente. |
+| Pruebas de interfaz | Playwright | Recorridos con API simulada y real. |
 
 ```text
 parkutp-proyweb/
-├── frontend/                 Interfaz Angular
-│   ├── src/app/core/         Autenticación, interceptor y URL de API
-│   ├── src/app/layout/       Navegación y estructura compartida
-│   ├── src/app/features/
-│   │   ├── administracion/   Sedes y estacionamientos
-│   │   └── gestion-estacionamientos/  Accesos, operación e historial
-│   └── tests/               Recorridos automatizados del frontend
-├── parkutp/                  Backend Java, Maven Wrapper y scripts
-│   ├── src/main/             API, negocio, seguridad, entidades y vistas previas
-│   ├── src/test/             Pruebas Java
-│   ├── evidencias/           Evidencias del avance 2
-│   ├── postman/              Colecciones de la API
-│   └── docs/                 Documentación técnica del backend
-├── docs/                     Índice, guías y evidencias del avance actual
-├── postman/                  Colecciones de la API
-└── README.md                 Punto de entrada al proyecto
+├── frontend/                 Angular y recorridos Playwright
+│   └── src/app/
+│       ├── core/             Sesión, guard, interceptor y API
+│       ├── layout/           Menú y estructura compartida
+│       └── features/         Administración y operación
+├── parkutp/                  Backend Spring Boot
+│   ├── src/                  Código y pruebas Java
+│   ├── scripts/              Inicio y configuración local
+│   └── docs/                 Documentación técnica
+├── docs/                     Guías y evidencias del equipo
+├── compose.yaml              Servicios de Docker
+└── README.md                 Guía principal del proyecto
 ```
 
-### Reglas principales
+Las vistas JSP/JSF del avance anterior se conservan en el backend. La interfaz principal del avance 3 es Angular.
 
-- Capacidad entera entre 1 y 10000; no puede reducirse por debajo de la ocupación.
-- Una zona llena rechaza ingresos; una inactiva permite salidas pendientes, pero no ingresos nuevos.
-- Una placa no ingresa dos veces seguidas ni sale sin una entrada pendiente en ese estacionamiento.
-- La creación de zona y accesos es transaccional; los movimientos utilizan control de concurrencia e idempotencia mediante UUID.
-- Las relaciones y el historial pueden impedir una eliminación. Desactivar es una alternativa cuando corresponda.
+## Inicio local
 
-Consulta el [modelo y la arquitectura](parkutp/docs/Modelo-y-arquitectura.md), las [consultas JPQL](parkutp/docs/JPQL-historial.md) y las [reglas y transacciones detalladas](docs/Guia-APF2.md#10-reglas-y-transacciones).
+### Requisitos
 
-## Configuración
+- Git y Docker Desktop iniciado.
+- Node.js compatible con Angular 22; el entorno local se verificó con Node 24.
+- npm y Microsoft Edge para los recorridos de pruebas en Windows.
+- Java 21 si se ejecuta el backend fuera de Docker.
 
-| Configuración | Ubicación o uso |
-|---|---|
-| URL de la API Angular | `frontend/src/app/core/api/api-config.ts`: `http://localhost:8081/api`. |
-| `CORS_ORIGENES` | Orígenes permitidos por la API; predeterminado `http://localhost:4200`. |
-| `PORT` | Puerto HTTP del backend; predeterminado 8081. |
-| `DB_URL`, `DB_USER`, `DB_PASSWORD` | Conexión cuando se utiliza PostgreSQL propio. |
-| `JWT_SECRET` | Clave de firma; conservarla fuera de Git. |
-| `DEMO_PASSWORD` | Contraseña inicial de cuentas nuevas de demostración. |
-| `TEST_DB_URL`, `TEST_DB_USER`, `TEST_DB_PASSWORD` | Base exclusiva de integración Java. |
+### 1. Abrir el proyecto
 
-El `.env` no se carga automáticamente en cualquier modalidad: el iniciador de `docs/ricardo` carga las tres variables indicadas en sus instrucciones. El script Java directo requiere configurar el entorno por separado. Si cambias el puerto de la API, actualiza también su URL en Angular. Ver [configuración completa](docs/Guia-APF2.md#5-configuración).
+En PowerShell, para la copia del Escritorio:
 
-## Verificación y pruebas
+```powershell
+cd "$env:USERPROFILE\Desktop\parkutp-proyweb"
+```
 
-### Compilar Angular
+Para una instalación nueva, clonar primero:
+
+```powershell
+cd "$env:USERPROFILE\Desktop"
+git clone https://github.com/serchiove/parkutp-proyweb.git
+cd parkutp-proyweb
+```
+
+### 2. Configurar las credenciales
+
+Solo cuando todavía no exista `.env`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File parkutp/scripts/Configurar-Docker.ps1
+```
+
+El script solicita la contraseña demo y genera la configuración local. `.env` está excluido de Git.
+
+| Variable | Uso |
+|:---|:---|
+| `WEB_PORT` | Puerto del backend; por defecto 8081. |
+| `DB_PASSWORD` | Contraseña de PostgreSQL. |
+| `JWT_SECRET` | Clave de firma de tokens. |
+| `DEMO_PASSWORD` | Contraseña inicial de las cuentas de demostración. |
+| `CORS_ORIGENES` | Origen permitido para Angular, normalmente `http://localhost:4200`. |
+
+### 3. Iniciar backend y base de datos
+
+```powershell
+docker compose up -d --build
+docker compose ps
+```
+
+### 4. Iniciar Angular
+
+```powershell
+cd frontend
+npm.cmd ci
+npm.cmd start
+```
+
+| Servicio | Dirección |
+|:---|:---|
+| **Aplicación Angular** | http://localhost:4200 |
+| API REST | http://localhost:8081/api |
+| Interfaz anterior | http://localhost:8081/login |
+
+### 5. Detener el proyecto
+
+En la terminal de Angular, presionar `Ctrl+C`. Desde la raíz del repositorio:
+
+```powershell
+docker compose stop
+```
+
+Los datos permanecen en el volumen de PostgreSQL.
+
+## Pruebas y evidencias
+
+### Resultados documentados
+
+| Verificación | Resultado | Fecha |
+|:---|:---|:---|
+| Compilación Angular | Correcta, con advertencias de presupuesto CSS | 18/11/2026 |
+| Administración y recarga de sesión, API simulada | 14 comprobaciones aprobadas | 18/11/2026 |
+| Aviso de cambios sin guardar, API simulada | 4 comprobaciones aprobadas | 18/11/2026 |
+| Accesos, operación, historial y roles, API simulada | 25 comprobaciones aprobadas | 18/11/2026 |
+| Operación con API real y PostgreSQL | 14 comprobaciones aprobadas | 17/11/2026 |
+| Administración con API real | Crear, editar, validar conflicto y eliminar registros propios: correcto | 17/11/2026 |
+| JavaScript de la interfaz anterior | 10 pruebas aprobadas | 17/11/2026 |
+
+**Las 43 comprobaciones simuladas verifican el frontend.** Los recorridos con API real comprueban la integración con Spring Boot y PostgreSQL. La suite Java y la persistencia después de reiniciar no se volvieron a ejecutar durante el último cierre.
+
+### Ejecutar la verificación del frontend
 
 Desde `frontend`:
 
 ```powershell
-npm run build
+npm.cmd test
 ```
 
-La salida integrada se genera en `frontend/dist/frontend/browser/`. Las advertencias de presupuesto de estilos se distinguen de un fallo de compilación.
+El comando compila y ejecuta los tres recorridos simulados. Playwright se instala con `npm ci`; Windows utiliza Edge. En otros entornos, configurar `PLAYWRIGHT_CHANNEL` o instalar Chromium mediante `npx playwright install chromium`.
 
-### Recorridos del frontend
+Para compilar sin ejecutar los recorridos:
 
-Los scripts utilizan Playwright y un navegador instalado para ese entorno de pruebas. Playwright no está declarado como dependencia del proyecto: debe estar disponible en el entorno, o indicarse mediante `PLAYWRIGHT_MODULE`. Consulta los requisitos específicos de cada guía antes de ejecutarlos.
+```powershell
+npm.cmd run build
+```
 
-| Recorrido | Guía |
-|---|---|
-| Sedes, estacionamientos y cambios sin guardar | [Documentación de Melissa](docs/melissa/LEEME-MELISSA.md). |
-| Accesos, operación, historial y persistencia tras reinicio | [Documentación de Ricardo](docs/ricardo/LEEME-RICARDO.md). |
+La salida se genera en `frontend/dist/frontend/browser`.
 
-**API simulada y API real son verificaciones distintas.** Los recorridos simulados evalúan la interfaz sin demostrar persistencia. Los reales requieren backend, credenciales y base preparados; algunos conservan registros para comprobarlos después del reinicio. Usa datos de prueba y sigue las instrucciones del recorrido elegido.
+<details>
+<summary><strong>Recorridos con API real</strong></summary>
 
-### Backend y Postman
+Requieren backend activo y credenciales demo disponibles localmente. Utilizar un entorno destinado a revisión.
 
-- [Pruebas Java y JavaScript del backend](docs/Guia-APF2.md#11-pruebas-automatizadas).
-- [Colecciones y procedimiento de Postman](docs/Guia-APF2.md#12-postman).
-- [Condiciones y resultados históricos de APF2](parkutp/docs/Verificacion-APF2.md).
+- `npm.cmd run test:api`: admite `DEMO_PASSWORD` en el entorno o en `.env`. Crea registros identificados con `RIC-` y conserva cuatro movimientos como evidencia.
+- `npm.cmd run test:sedes:api`: requiere `MELISSA_DEMO_PASSWORD`. Crea y elimina exclusivamente sus registros.
 
-Las pruebas de integración Java deben apuntar únicamente a `parkutp_test`, porque limpian tablas. Los resultados de APF2 son evidencia de esa entrega, no una nueva ejecución de las pruebas sobre cada cambio del avance 3.
+Para ejecutar el segundo recorrido con el origen CORS habitual de Docker:
 
-## Demostración
+```powershell
+$env:TEST_FRONTEND_HOST = 'localhost'
+$env:TEST_FRONTEND_PORT = '4200'
+npm.cmd run test:sedes:api
+```
 
-1. Iniciar sesión como ADMIN.
-2. Crear una sede y un estacionamiento; comprobar sus accesos iniciales.
-3. Editar capacidad o estado y mostrar las validaciones del formulario.
-4. Registrar un ingreso y comprobar ocupados y disponibles.
+El puerto debe estar libre. Los recorridos actualizan capturas bajo `docs/`; revisar las diferencias antes de hacer commit.
+
+</details>
+
+<details>
+<summary><strong>Advertencias conocidas del cierre</strong></summary>
+
+- Algunos estilos superan el presupuesto de advertencia de 4 kB; la compilación termina correctamente.
+- La auditoría del 17/11/2026 reportó alertas en dependencias de desarrollo relacionadas con `picomatch`. No ofrecía una corrección compatible para toda la cadena. No se aplicó una degradación forzada de Angular.
+- La auditoría de dependencias de producción de esa fecha no reportó vulnerabilidades.
+
+Detalles en [Cierre APF3](docs/CIERRE-APF3.md).
+
+</details>
+
+## Recorrido para la demostración
+
+1. Iniciar sesión como ADMIN y presentar los permisos.
+2. Crear una sede y un estacionamiento activo; revisar los accesos generados.
+3. Mostrar una validación y el aviso al salir de un formulario sin guardar.
+4. Registrar un ingreso y comprobar el aumento de ocupación.
 5. Registrar la salida y buscar la placa en el historial.
-6. Mostrar CONSULTA sin controles de registro y explicar la autorización del servidor.
-7. Escribir un cambio sin guardarlo e intentar navegar: mostrar el aviso para seguir editando o salir.
+6. Recargar la página y mostrar que la sesión permanece activa.
+7. Cerrar sesión e ingresar como CONSULTA para mostrar las acciones disponibles.
 
 ## Solución de problemas
 
-| Síntoma | Qué revisar |
-|---|---|
-| `node` o `npm` no se reconoce | Instalar una versión compatible, verificar PATH y abrir una terminal nueva de VS Code. |
-| Angular indica que no hay conexión con el servidor | Comprobar el arranque de Spring Boot en 8081, la URL de API y CORS. |
-| Puerto 4200 ocupado | Detener el Angular anterior antes de iniciar otro. |
-| PowerShell bloquea el iniciador | Usar el comando documentado con `powershell -NoProfile -ExecutionPolicy Bypass -File`. |
-| No se detecta Java | Definir `JAVA_HOME` apuntando al JDK 21 completo. |
-| El login falla después de cambiar `DEMO_PASSWORD` | Las cuentas existentes conservan la contraseña con la que se crearon. |
-| La página vuelve al login al recargar | La sesión Angular está en memoria; iniciar sesión de nuevo. |
-| API devuelve 401 / 403 | Revisar sesión y token / permisos del rol, respectivamente. |
-| No se permite eliminar un recurso | Revisar dependencias o historial; leer el mensaje de la API. |
-
-Para problemas de PostgreSQL, WAR y pruebas, consulta el [diagnóstico del backend](docs/Guia-APF2.md#15-solución-de-problemas).
+| Situación | Qué revisar |
+|:---|:---|
+| PowerShell bloquea `npm.ps1` | Usar `npm.cmd`, como en los ejemplos. |
+| Angular no conecta con la API | Comprobar `docker compose ps`, el puerto 8081 y `CORS_ORIGENES`. |
+| El login rechaza las credenciales | Usar la contraseña demo configurada en el entorno local. |
+| La sesión vence | Iniciar sesión de nuevo; una recarga no renueva un JWT vencido. |
+| Un registro no puede eliminarse | Leer el mensaje de la API: puede tener dependencias o historial asociado. |
+| El puerto 4200 está ocupado | Detener el servidor Angular anterior antes de iniciar otro. |
+| Se abre la interfaz antigua | Entrar a Angular en el puerto 4200. |
 
 ## Documentación y equipo
 
-- [Índice de documentación](docs/README.md).
-- [Sedes y estacionamientos: implementación y evidencias](docs/melissa/LEEME-MELISSA.md).
-- [Accesos, operación e historial: implementación y evidencias](docs/ricardo/LEEME-RICARDO.md).
-- [Guía histórica de instalación y verificación APF2](docs/Guia-APF2.md).
+Este README es el punto de entrada del proyecto. Las guías técnicas y las evidencias detalladas se conservan como material de apoyo.
 
-| Integrante | Módulos del avance Angular |
-|---|---|
-| Sergio | Base de la aplicación, autenticación, diseño general e integración. |
-| Melissa | Sedes, estacionamientos, validaciones y protección de cambios sin guardar. |
-| Ricardo | Accesos, operación, historial y sus recorridos de verificación. |
+| Material | Enlace |
+|:---|:---|
+| Documentación histórica del avance 2 | [Guía APF2](docs/Guia-APF2.md) |
+| Estado del cierre y límites de verificación | [Cierre APF3](docs/CIERRE-APF3.md) |
+| Sedes y estacionamientos | [Guía de Melissa](docs/melissa/LEEME-MELISSA.md) |
+| Accesos, operación e historial | [Guía de Ricardo](docs/ricardo/LEEME-RICARDO.md) |
+| Imágenes de administración con API real | [Evidencias de Melissa](docs/melissa/evidencias/api-real/) |
+| Resultados y capturas de operación | [Evidencias de Ricardo](docs/ricardo/evidencias/api-real/) |
 
-Para traer cambios de `main` a una rama personal, primero guarda el trabajo local y comprueba `git status`. Con el directorio limpio y estando en tu rama:
-
-```powershell
-git fetch origin
-git merge origin/main
-```
-
-Revisa y prueba antes de hacer commit o push. Coordina la integración con el equipo. No subas `.env`, tokens, contraseñas, bases locales, `node_modules` ni archivos generados.
-
-## Límites actuales
-
-No se incluyen reservas, integración con la app UTP, detección automática mediante sensores físicos ni administración completa de cuentas. Son posibilidades de evolución. El funcionamiento de la aplicación no demuestra por sí mismo una reducción de congestión: esa evaluación requiere uso y medición en el entorno universitario.
+**Equipo:** Sergio, Melissa y Ricardo. Proyecto académico de Desarrollo Web Integrado.

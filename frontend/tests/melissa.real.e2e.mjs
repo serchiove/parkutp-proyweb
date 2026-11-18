@@ -12,8 +12,10 @@ const login = await api.post('/api/auth/login', { data: { username: 'admin', pas
 assert.equal(login.status(), 200);
 const headers = { Authorization: `Bearer ${(await login.json()).token}` };
 const server = crearServidor(fileURLToPath(new URL('../dist/frontend/browser/', import.meta.url)));
-await new Promise(resolve => server.listen(5310, '127.0.0.1', resolve));
-const browser = await chromium.launch({ ...(process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {}), headless: true });
+const frontendPort = Number(process.env.TEST_FRONTEND_PORT ?? 5310);
+const frontendHost = process.env.TEST_FRONTEND_HOST ?? '127.0.0.1';
+await new Promise(resolve => server.listen(frontendPort, frontendHost, resolve));
+const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL ?? (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'es-PE' });
 const page = await context.newPage();
 const errors = []; page.on('pageerror', error => errors.push(error.message));
@@ -27,7 +29,7 @@ async function go(path) {
   await page.getByRole('heading', { name: path === '/sedes' ? 'Sedes' : 'Estacionamientos', exact: true }).waitFor();
 }
 try {
-  await page.goto('http://127.0.0.1:5310/login');
+  await page.goto(`http://${frontendHost}:${frontendPort}/login`);
   await page.locator('#username').fill('admin'); await page.locator('#password').fill(process.env.MELISSA_DEMO_PASSWORD);
   await page.getByRole('button', { name: 'Iniciar sesión' }).click(); await page.waitForURL('**/operacion');
   await go('/sedes');
@@ -78,5 +80,5 @@ try {
   // Limpieza limitada a los identificadores creados por este recorrido.
   if (zonaId) await api.delete(`/api/estacionamientos/${zonaId}`, { headers });
   await api.delete(`/api/sedes/${sedeId}`, { headers });
-  await context.close(); await browser.close(); await api.dispose(); await new Promise(resolve => server.close(resolve));
+  await context.close(); await browser.close(); await api.dispose(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve));
 }

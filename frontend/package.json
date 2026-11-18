@@ -6,7 +6,10 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "npm run build && npm run test:e2e",
+    "test:e2e": "node tests/melissa.e2e.mjs && node tests/cambios-sin-guardar.e2e.mjs && node tests/ricardo.e2e.mjs",
+    "test:api": "node tests/ricardo.real.e2e.mjs",
+    "test:sedes:api": "node tests/melissa.real.e2e.mjs"
   },
   "private": true,
   "dependencies": {
@@ -23,6 +26,7 @@
     "@angular/build": "^22.2.7",
     "@angular/cli": "^22.2.7",
     "@angular/compiler-cli": "^22.2.0",
+    "playwright": "^1.65.1",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2"
   }

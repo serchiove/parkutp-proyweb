@@ -1,56 +1,38 @@
-# Frontend Angular de ParkUTP
+# ParkUTP: frontend Angular
 
-Interfaz del avance 3 conectada a la API REST de Spring Boot. Para preparar Java, PostgreSQL y las cuentas locales, sigue el [README principal](../README.md#ejecutar-en-windows).
+Interfaz del avance 3 integrada con Spring Boot y PostgreSQL. Verificada con Node 24 y Microsoft Edge en Windows.
 
-## Arranque
+## Inicio
 
-Desde esta carpeta, con una versión de Node compatible con Angular CLI 22.2.7 y npm disponibles:
+Con el backend disponible en http://localhost:8081, ejecutar desde frontend:
 
 ```powershell
-npm ci
-npm start
+npm.cmd ci
+npm.cmd start
 ```
 
-Abre `http://localhost:4200/login`. La API debe estar iniciada en otra terminal en `http://localhost:8081/api`. El arranque de Angular no inicia el backend.
+Abrir http://localhost:4200. ADMIN administra sedes, estacionamientos y accesos; OPERADOR registra movimientos; CONSULTA consulta aforo e historial. El backend valida los permisos. La sesión se conserva en `sessionStorage` durante las recargas de esa pestaña; al cerrar sesión o recibir un 401 se elimina.
 
-## Pantallas
+## Verificación
 
-| Ruta | Módulo |
-|---|---|
-| `/login` | Inicio de sesión. |
-| `/sedes` | Sedes. |
-| `/estacionamientos` | Estacionamientos. |
-| `/accesos` | Accesos por estacionamiento. |
-| `/operacion` | Aforo y movimientos según el rol. |
-| `/historial` | Movimientos con filtros. |
+```powershell
+npm.cmd test
+```
 
-La navegación comparte `AppShell`. `AuthService` conserva la sesión en memoria y el interceptor añade el JWT a las solicitudes. Al recargar se requiere iniciar sesión de nuevo. Las opciones y los formularios respetan el rol; la API verifica los permisos efectivos.
+Compila y ejecuta los recorridos simulados, incluido el caso de mantener la sesión tras recargar. Estas pruebas no acreditan persistencia. Playwright se instala con npm ci. En Windows se utiliza Edge; para otro navegador configurar PLAYWRIGHT_CHANNEL. En Linux instalar Chromium con `npx playwright install chromium`.
 
-## Organización del código
+Las pruebas reales requieren el backend, una cuenta demo y datos de prueba. `npm.cmd run test:api` admite DEMO_PASSWORD en el entorno o en el archivo local .env. Crea una sede identificada con RIC- y conserva cuatro movimientos para revisar persistencia. Nunca imprime la contraseña.
 
-- `src/app/core/`: autenticación, guard, interceptor y configuración de API.
-- `src/app/layout/`: estructura y menú compartidos.
-- `src/app/features/administracion/`: sedes, estacionamientos, formularios y aviso de cambios sin guardar.
-- `src/app/features/gestion-estacionamientos/`: accesos, operación e historial.
-- `tests/`: recorridos con API simulada y real.
+`npm.cmd run test:sedes:api` requiere MELISSA_DEMO_PASSWORD; crea y elimina exclusivamente sus propios registros. Su frontend usa 127.0.0.1:5310 por defecto. Para la configuración CORS local de Docker:
 
-La URL se configura en [api-config.ts](src/app/core/api/api-config.ts). Si cambia el backend, ajustar esa URL y el origen CORS permitido en el servidor.
+```powershell
+$env:TEST_FRONTEND_HOST = 'localhost'
+$env:TEST_FRONTEND_PORT = '4200'
+npm.cmd run test:sedes:api
+```
+
+No ejecutar dos servidores en el mismo puerto. Los recorridos actualizan imágenes bajo docs. Revisar sus diferencias antes de hacer commit.
 
 ## Compilación
 
-```powershell
-npm run build
-```
-
-La aplicación integrada se genera en `dist/frontend/browser/`. `npm run watch` compila en modo de desarrollo y observa los cambios. `npm start` ejecuta el servidor de desarrollo con recarga automática.
-
-## Pruebas
-
-Los recorridos de `tests/` usan Playwright preparado en un entorno de pruebas; no se instala mediante el `npm ci` del proyecto. Compilar antes de ejecutar los recorridos que sirven `dist/frontend/browser/`. Cada prueba real tiene requisitos propios de puerto, credenciales, datos y salida compilada.
-
-- [Sedes, estacionamientos y formularios](../docs/melissa/LEEME-MELISSA.md).
-- [Accesos, operación, historial y persistencia](../docs/ricardo/LEEME-RICARDO.md).
-
-Aunque `package.json` conserva un script `test`, el `angular.json` actual no configura un target de pruebas unitarias. No se presenta `npm test` ni `ng e2e` como procedimientos configurados de este proyecto.
-
-Los recorridos con API simulada verifican la interfaz; no demuestran persistencia PostgreSQL. Los recorridos con API real pueden crear o conservar registros de prueba: leer la guía correspondiente antes de ejecutarlos.
+`npm.cmd run build` genera dist/frontend/browser. Todas las suites utilizan esa salida. Las advertencias del presupuesto CSS se documentan en el cierre APF3.

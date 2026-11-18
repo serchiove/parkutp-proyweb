@@ -8,7 +8,7 @@ const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODUL
 const server = crearServidor(fileURLToPath(new URL('../dist/frontend/browser/', import.meta.url)));
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const base = `http://127.0.0.1:${server.address().port}`;
-const browser = await chromium.launch({ ...(process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {}), headless: true });
+const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL ?? (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
 const checks = [];
 const check = message => { checks.push(message); console.log('OK:', message); };
 const output = new URL('../../docs/melissa/evidencias/frontend-simulado/', import.meta.url);
@@ -95,5 +95,6 @@ try {
   await context.close();
 } finally {
   await browser.close();
+  server.closeAllConnections();
   await new Promise(resolve => server.close(resolve));
 }

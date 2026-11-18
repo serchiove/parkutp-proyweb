@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { crearServidor } from '../serve-ricardo.mjs';
 const require = createRequire(import.meta.url);
 const { chromium, request } = require(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
-const config = await readFile(new URL('../../.env', import.meta.url), 'utf8');
-const password = config.split(/\r?\n/).find(s => s.startsWith('DEMO_PASSWORD='))?.slice(14).replace(/^['"]|['"]$/g, '');
+const config = process.env.DEMO_PASSWORD ? '' : await readFile(new URL('../../.env', import.meta.url), 'utf8');
+const password = process.env.DEMO_PASSWORD ?? config.split(/\r?\n/).find(s => s.startsWith('DEMO_PASSWORD='))?.slice(14).replace(/^['"]|['"]$/g, '');
 assert.ok(password, 'Debe existir DEMO_PASSWORD en .env local.');
 const api = await request.newContext({ baseURL: 'http://localhost:8081' });
 const login = await api.post('/api/auth/login', { data: { username: 'admin', password } });
@@ -24,9 +24,9 @@ assert.equal(parkResponse.status(), 201);
 const parking = await parkResponse.json();
 const output = new URL('../../docs/ricardo/evidencias/api-real/', import.meta.url);
 await mkdir(output, { recursive: true });
-const server = crearServidor(fileURLToPath(new URL('../dist/ricardo/browser/', import.meta.url)));
+const server = crearServidor(fileURLToPath(new URL('../dist/frontend/browser/', import.meta.url)));
 await new Promise((resolve, reject) => { server.once('error', reject); server.listen(4200, 'localhost', resolve); });
-const browser = await chromium.launch({ channel: 'msedge', headless: true });
+const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL ?? (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
 const results = [];
 const check = text => { results.push(text); console.log('OK:', text); };
 
@@ -150,7 +150,7 @@ try {
   assert.equal((await aforo.json()).ocupados, 0);
   check('Consulta final real: 4 movimientos guardados y aforo 0.');
   await writeFile(new URL('resultados.json', output), JSON.stringify({
-    fecha: new Date().toISOString(), entorno: 'Angular + Spring Boot + PostgreSQL 18.7 local; API sin simulación',
+    fecha: new Date().toISOString(), entorno: 'Angular + Spring Boot + PostgreSQL local; API sin simulación',
     sedeId, estacionamientoId: parking.id, nombreEstacionamiento: parking.nombre,
     movimientos: movimientos.map(({ id, tipo, placa, registradoEn }) => ({ id, tipo, placa, registradoEn })),
     resultados: results,

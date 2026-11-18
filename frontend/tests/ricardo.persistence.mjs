@@ -20,9 +20,9 @@ assert.deepEqual(movimientos.map(m => m.id).sort(), report.movimientos.map(m => 
 assert.equal(movimientos.length, 4);
 const parking = await api.get(`/api/estacionamientos/${report.estacionamientoId}`, { headers });
 assert.equal((await parking.json()).ocupados, 0);
-const server = crearServidor(fileURLToPath(new URL('../dist/ricardo/browser/', import.meta.url)));
+const server = crearServidor(fileURLToPath(new URL('../dist/frontend/browser/', import.meta.url)));
 await new Promise((resolve, reject) => { server.once('error', reject); server.listen(4200, 'localhost', resolve); });
-const browser = await chromium.launch({ channel: 'msedge', headless: true });
+const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL ?? (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1050 } });
   await page.route('https://fonts.googleapis.com/**', route => route.abort());

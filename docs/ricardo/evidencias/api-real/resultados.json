@@ -1,33 +1,33 @@
 {
-  "fecha": "2026-11-17T12:45:23.060Z",
+  "fecha": "2026-11-17T21:24:28.725Z",
   "entorno": "Angular + Spring Boot + PostgreSQL 18.7 local; API sin simulación",
-  "sedeId": "RIC-MWKOQJWN",
-  "estacionamientoId": 1,
-  "nombreEstacionamiento": "Zona Ricardo MWKOQJWN",
+  "sedeId": "RIC-MWL7A0Q9",
+  "estacionamientoId": 2,
+  "nombreEstacionamiento": "Zona Ricardo MWL7A0Q9",
   "movimientos": [
     {
-      "id": 4,
+      "id": 12,
       "tipo": "SALIDA",
       "placa": null,
-      "registradoEn": "2026-11-17T12:45:22.147281Z"
+      "registradoEn": "2026-11-17T21:24:27.218279Z"
     },
     {
-      "id": 3,
+      "id": 11,
       "tipo": "ENTRADA",
       "placa": null,
-      "registradoEn": "2026-11-17T12:45:22.063057Z"
+      "registradoEn": "2026-11-17T21:24:27.031855Z"
     },
     {
-      "id": 2,
+      "id": 10,
       "tipo": "SALIDA",
       "placa": "RIC-123",
-      "registradoEn": "2026-11-17T12:45:20.553141Z"
+      "registradoEn": "2026-11-17T21:24:24.181426Z"
     },
     {
-      "id": 1,
+      "id": 9,
       "tipo": "ENTRADA",
       "placa": "RIC-123",
-      "registradoEn": "2026-11-17T12:45:20.139835Z"
+      "registradoEn": "2026-11-17T21:24:23.572436Z"
     }
   ],
   "resultados": [
@@ -45,9 +45,5 @@
     "OPERADOR registra ingreso y salida sin placa con la API real.",
     "CONSULTA: formulario oculto y backend rechaza POST directo con 403.",
     "Consulta final real: 4 movimientos guardados y aforo 0."
-  ],
-  "persistencia": {
-    "fecha": "2026-11-17T12:47:45.336Z",
-    "resultado": "Después de reiniciar el backend: mismos 4 IDs de movimiento, aforo 0 y consulta Angular correcta."
-  }
+  ]
 }
