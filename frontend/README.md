@@ -1,59 +1,56 @@
-# Frontend
+# Frontend Angular de ParkUTP
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.7.
+Interfaz del avance 3 conectada a la API REST de Spring Boot. Para preparar Java, PostgreSQL y las cuentas locales, sigue el [README principal](../README.md#ejecutar-en-windows).
 
-## Development server
+## Arranque
 
-To start a local development server, run:
+Desde esta carpeta, con una versión de Node compatible con Angular CLI 22.2.7 y npm disponibles:
 
-```bash
-ng serve
+```powershell
+npm ci
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Abre `http://localhost:4200/login`. La API debe estar iniciada en otra terminal en `http://localhost:8081/api`. El arranque de Angular no inicia el backend.
 
-## Code scaffolding
+## Pantallas
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+| Ruta | Módulo |
+|---|---|
+| `/login` | Inicio de sesión. |
+| `/sedes` | Sedes. |
+| `/estacionamientos` | Estacionamientos. |
+| `/accesos` | Accesos por estacionamiento. |
+| `/operacion` | Aforo y movimientos según el rol. |
+| `/historial` | Movimientos con filtros. |
 
-```bash
-ng generate component component-name
+La navegación comparte `AppShell`. `AuthService` conserva la sesión en memoria y el interceptor añade el JWT a las solicitudes. Al recargar se requiere iniciar sesión de nuevo. Las opciones y los formularios respetan el rol; la API verifica los permisos efectivos.
+
+## Organización del código
+
+- `src/app/core/`: autenticación, guard, interceptor y configuración de API.
+- `src/app/layout/`: estructura y menú compartidos.
+- `src/app/features/administracion/`: sedes, estacionamientos, formularios y aviso de cambios sin guardar.
+- `src/app/features/gestion-estacionamientos/`: accesos, operación e historial.
+- `tests/`: recorridos con API simulada y real.
+
+La URL se configura en [api-config.ts](src/app/core/api/api-config.ts). Si cambia el backend, ajustar esa URL y el origen CORS permitido en el servidor.
+
+## Compilación
+
+```powershell
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+La aplicación integrada se genera en `dist/frontend/browser/`. `npm run watch` compila en modo de desarrollo y observa los cambios. `npm start` ejecuta el servidor de desarrollo con recarga automática.
 
-```bash
-ng generate --help
-```
+## Pruebas
 
-## Building
+Los recorridos de `tests/` usan Playwright preparado en un entorno de pruebas; no se instala mediante el `npm ci` del proyecto. Compilar antes de ejecutar los recorridos que sirven `dist/frontend/browser/`. Cada prueba real tiene requisitos propios de puerto, credenciales, datos y salida compilada.
 
-To build the project run:
+- [Sedes, estacionamientos y formularios](../docs/melissa/LEEME-MELISSA.md).
+- [Accesos, operación, historial y persistencia](../docs/ricardo/LEEME-RICARDO.md).
 
-```bash
-ng build
-```
+Aunque `package.json` conserva un script `test`, el `angular.json` actual no configura un target de pruebas unitarias. No se presenta `npm test` ni `ng e2e` como procedimientos configurados de este proyecto.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Los recorridos con API simulada verifican la interfaz; no demuestran persistencia PostgreSQL. Los recorridos con API real pueden crear o conservar registros de prueba: leer la guía correspondiente antes de ejecutarlos.
